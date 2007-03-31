@@ -32,7 +32,7 @@ class Recipe:
     def install(self):
         options = self.options
         location = options['location']
-
+        
         requirements, ws = self.egg.working_set()
         ws_locations = [d.location for d in ws]
 
@@ -133,17 +133,30 @@ class Recipe:
         z_log_dir = os.path.dirname(z_log)
         if not os.path.exists(z_log_dir):
             os.makedirs(z_log_dir)
+        
+        # auto generate list of databases if possible
+        dbs_path = os.path.sep.join(('var', 'filestorage'))
+        dbs_location = os.path.join(base_dir, dbs_path)
+        dbs_location = options.get('dbs_location', dbs_location)
+        if not os.path.exists(dbs_location):
+            os.makedirs(dbs_location)
             
-        file_storage = options.get('file-storage', os.path.sep.join(('var', 'filestorage', 'Data.fs',)))
-        file_storage = os.path.join(base_dir, file_storage)
-        file_storage_dir = os.path.dirname(file_storage)
-        if not os.path.exists(file_storage_dir):
-            os.makedirs(file_storage_dir)
+        dbs = options.get('dbs',None)
+        db_section = filestorage_template % dict(
+                    filestorage_name='1',
+                    filestorage_path="%s/Data.fs" % dbs_location)
+        if dbs:
+            dbs = dbs.split('\n')
+            for db in dbs:
+                db_section += filestorage_template % dict(
+                            filestorage_name=db,
+                            filestorage_path="%s/%s.fs" % (dbs_location, db),
+                        )
             
         zope_conf = zope_conf_template % dict(instance_home = instance_home,
                                               event_log = event_log,
                                               z_log = z_log,
-                                              file_storage = file_storage,
+                                              db_section = db_section,
                                               zeo_address = zeo_address,
                                               zope_conf_additional = zope_conf_additional,)
         
@@ -169,25 +182,13 @@ class Recipe:
     def install_scripts(self, ws_locations):
         options = self.options
         location = options['location']
+        bindir = options['bin-directory']
+        ctlscript = "%s/%s" % (bindir, self.name)
         
-        zope_conf_path = os.path.join(location, 'etc', 'zeo.conf')
-        extra_paths = [os.path.join(location),
-                       os.path.join(options['zope2-location'], 'lib', 'python')
-                      ]
-        extra_paths.extend(ws_locations)
+        if os.path.lexists(ctlscript):
+            os.remove(ctlscript)
         
-        requirements, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
-
-        zc.buildout.easy_install.scripts(
-            [(self.name, 'plone.recipe.zope2zeoserver.ctl', 'main')],
-            ws, options['executable'], options['bin-directory'],
-            extra_paths = extra_paths,
-            arguments = ('\n        ["-C", %r]'
-                         '\n        + sys.argv[1:]'
-                         % zope_conf_path
-                         ),
-            )
-        
+        os.symlink("%s/bin/zeoctl" % location, ctlscript)
 
     def build_package_includes(self):
         """Create ZCML slugs in etc/package-includes
@@ -237,6 +238,12 @@ class Recipe:
                     % (package, filename)
                     )
 
+filestorage_template = """\
+<filestorage %(filestorage_name)s>
+    path %(filestorage_path)s
+</filestorage>
+"""
+
 # The template used to build zeo.conf
 zope_conf_template="""\
 %%define INSTANCE %(instance_home)s
@@ -247,9 +254,7 @@ zope_conf_template="""\
   invalidation-queue-size 100
 </zeo>
 
-<filestorage 1>
-  path %(file_storage)s
-</filestorage>
+%(db_section)s
 
 <eventlog>
   level info
