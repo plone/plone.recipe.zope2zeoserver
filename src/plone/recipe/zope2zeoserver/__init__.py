@@ -44,6 +44,9 @@ class Recipe:
         # patch the result. A better approach might be to provide independent
         # instance-creation logic, but this raises lots of issues that
         # need to be stored out first.
+
+        # BBB: maybe a job for instancemanager
+
         mkzeoinstance = os.path.join(options['zope2-location'],
                                      'utilities', 'mkzeoinstance.py')
 
@@ -190,6 +193,11 @@ class Recipe:
         
         os.symlink("%s/bin/zeoctl" % location, ctlscript)
 
+        run_script = run_script_template % options
+
+        run_script_path = os.path.join(location, 'run')
+        open(run_script_path, 'w').write(run_script)
+
     def build_package_includes(self):
         """Create ZCML slugs in etc/package-includes
         """
@@ -283,4 +291,25 @@ zope_conf_template="""\
 </runner>
 
 %(zope_conf_additional)s
+"""
+
+daemontools_run_template="""\
+#! /bin/sh
+#
+# run script for zope under djb daemontools
+#
+
+exec 2>&1
+
+PYTHON="%(python_executable)s"
+ZOPE_HOME="%(zope_home)s"
+INSTANCE_HOME="%(instance_home)s"
+CONFIG_FILE="%(instance_home)s/etc/zope.conf"
+SOFTWARE_HOME="$ZOPE_HOME/lib/python"
+PYTHONPATH="$SOFTWARE_HOME"
+export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
+
+ZOPE_RUN="$SOFTWARE_HOME/Zope2/Startup/run.py"
+
+exec /command/setuidgid zope "$PYTHON" "$ZOPE_RUN" -C "$CONFIG_FILE" "$@"
 """
