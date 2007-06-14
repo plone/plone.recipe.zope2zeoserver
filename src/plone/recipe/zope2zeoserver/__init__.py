@@ -193,7 +193,7 @@ class Recipe:
         
         os.symlink("%s/bin/zeoctl" % location, ctlscript)
 
-        run_script = run_script_template % options
+        run_script = daemontools_run_template % options
 
         run_script_path = os.path.join(location, 'run')
         open(run_script_path, 'w').write(run_script)
@@ -301,10 +301,10 @@ daemontools_run_template="""\
 
 exec 2>&1
 
-PYTHON="%(python_executable)s"
-ZOPE_HOME="%(zope_home)s"
-INSTANCE_HOME="%(instance_home)s"
-CONFIG_FILE="%(instance_home)s/etc/zope.conf"
+PYTHON="%(bin-directory)s/zopepy"
+ZOPE_HOME="%(zope2-location)s"
+INSTANCE_HOME="%(location)s"
+CONFIG_FILE="$INSTANCE_HOME/etc/zope.conf"
 SOFTWARE_HOME="$ZOPE_HOME/lib/python"
 PYTHONPATH="$SOFTWARE_HOME"
 export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
