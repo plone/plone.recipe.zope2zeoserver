@@ -120,7 +120,7 @@ class Recipe:
             products = [os.path.abspath(p) for p in products]
         
         instance_home = location
-        zeo_address = options.get('zeo-address', '8100')
+        zeo_address = options.get('address', '8100')
         zope_conf_additional = options.get('zope-conf-additional', '')
         
         base_dir = self.buildout['buildout']['directory']
