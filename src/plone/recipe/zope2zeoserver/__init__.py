@@ -108,33 +108,32 @@ class Recipe:
         
         instance_home = location
         
-        # Don't do this if we have a manual zeo.conf
-        zeo_conf = options.get('zeo-conf', None)
-        if zeo_conf is not None:
-            return
+        zope_conf_path = options.get('zeo-conf', None)
+        if zope_conf_path is not None:
+            zope_conf = "%%include %s" % os.path.abspath(zope_conf_path)
+        else:
+            zeo_address = options.get('zeo-address', '8100')
+            zope_conf_additional = options.get('zope-conf-additional', '')
         
-        zeo_address = options.get('zeo-address', '8100')
-        zope_conf_additional = options.get('zope-conf-additional', '')
+            base_dir = self.buildout['buildout']['directory']
         
-        base_dir = self.buildout['buildout']['directory']
-        
-        z_log_name = options.get('zeo-log', os.path.sep.join(('var', 'log', self.name + '.log',)))
-        z_log = os.path.join(base_dir, z_log_name)
-        z_log_dir = os.path.dirname(z_log)
-        if not os.path.exists(z_log_dir):
-            os.makedirs(z_log_dir)
+            z_log_name = options.get('zeo-log', os.path.sep.join(('var', 'log', self.name + '.log',)))
+            z_log = os.path.join(base_dir, z_log_name)
+            z_log_dir = os.path.dirname(z_log)
+            if not os.path.exists(z_log_dir):
+                os.makedirs(z_log_dir)
             
-        file_storage = options.get('file-storage', os.path.sep.join(('var', 'filestorage', 'Data.fs',)))
-        file_storage = os.path.join(base_dir, file_storage)
-        file_storage_dir = os.path.dirname(file_storage)
-        if not os.path.exists(file_storage_dir):
-            os.makedirs(file_storage_dir)
+            file_storage = options.get('file-storage', os.path.sep.join(('var', 'filestorage', 'Data.fs',)))
+            file_storage = os.path.join(base_dir, file_storage)
+            file_storage_dir = os.path.dirname(file_storage)
+            if not os.path.exists(file_storage_dir):
+                os.makedirs(file_storage_dir)
             
-        zope_conf = zope_conf_template % dict(instance_home = instance_home,
-                                              z_log = z_log,
-                                              file_storage = file_storage,
-                                              zeo_address = zeo_address,
-                                              zope_conf_additional = zope_conf_additional,)
+            zope_conf = zope_conf_template % dict(instance_home = instance_home,
+                                                  z_log = z_log,
+                                                  file_storage = file_storage,
+                                                  zeo_address = zeo_address,
+                                                  zope_conf_additional = zope_conf_additional,)
         
         zope_conf_path = os.path.join(location, 'etc', 'zeo.conf')
         open(zope_conf_path, 'w').write(zope_conf)
@@ -161,10 +160,7 @@ class Recipe:
         
         zeo_conf = options.get('zeo-conf', None)
         
-        if zeo_conf is not None:
-            zeo_conf = os.path.abspath(zeo_conf)
-        else:
-            zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
+        zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
         extra_paths = [os.path.join(location),
                        os.path.join(options['zope2-location'], 'lib', 'python')
                       ]
