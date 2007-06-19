@@ -58,7 +58,7 @@ class Recipe:
                 '\n'.join(ws_locations))
 
             # Make a new zeo.conf based on options in buildout.cfg
-            self.build_zope_conf()
+            self.build_zeo_conf()
             
             # Patch extra paths into binaries
             self.patch_binaries(ws_locations)
@@ -66,8 +66,6 @@ class Recipe:
             # Install extra scripts
             self.install_scripts(ws_locations)
 
-            # Add zcml files to package-includes
-            self.build_package_includes()
         except:
             # clean up
             shutil.rmtree(location)
@@ -101,34 +99,26 @@ class Recipe:
 
         return location
 
-    def build_zope_conf(self):
+    def build_zeo_conf(self):
         """Create a zeo.conf file
         """
         
         options = self.options
         location = options['location']
         
-        products = options.get('products', '')
-        if products:
-            products = products.split('\n')
-            # Filter out empty directories
-            products = [p for p in products if p]
-            # Make sure we have consistent path seperators
-            products = [os.path.abspath(p) for p in products]
-        
         instance_home = location
+        
+        # Don't do this if we have a manual zeo.conf
+        zeo_conf = options.get('zeo-conf', None)
+        if zeo_conf is not None:
+            return
+        
         zeo_address = options.get('zeo-address', '8100')
         zope_conf_additional = options.get('zope-conf-additional', '')
         
         base_dir = self.buildout['buildout']['directory']
         
-        event_log_name = options.get('event-log', os.path.sep.join(('var', 'log', 'event.log',)))
-        event_log = os.path.join(base_dir, event_log_name)
-        event_log_dir = os.path.dirname(event_log)
-        if not os.path.exists(event_log_dir):
-            os.makedirs(event_log_dir)
-            
-        z_log_name = options.get('z-log', os.path.sep.join(('var', 'log', 'zeo.log',)))
+        z_log_name = options.get('zeo-log', os.path.sep.join(('var', 'log', self.name + '.log',)))
         z_log = os.path.join(base_dir, z_log_name)
         z_log_dir = os.path.dirname(z_log)
         if not os.path.exists(z_log_dir):
@@ -141,7 +131,6 @@ class Recipe:
             os.makedirs(file_storage_dir)
             
         zope_conf = zope_conf_template % dict(instance_home = instance_home,
-                                              event_log = event_log,
                                               z_log = z_log,
                                               file_storage = file_storage,
                                               zeo_address = zeo_address,
@@ -170,7 +159,12 @@ class Recipe:
         options = self.options
         location = options['location']
         
-        zope_conf_path = os.path.join(location, 'etc', 'zeo.conf')
+        zeo_conf = options.get('zeo-conf', None)
+        
+        if zeo_conf is not None:
+            zeo_conf = os.path.abspath(zeo_conf)
+        else:
+            zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
         extra_paths = [os.path.join(location),
                        os.path.join(options['zope2-location'], 'lib', 'python')
                       ]
@@ -184,58 +178,10 @@ class Recipe:
             extra_paths = extra_paths,
             arguments = ('\n        ["-C", %r]'
                          '\n        + sys.argv[1:]'
-                         % zope_conf_path
+                         % zeo_conf
                          ),
             )
-        
 
-    def build_package_includes(self):
-        """Create ZCML slugs in etc/package-includes
-        """
-        
-        location = self.options['location']
-        zcml = self.options.get('zcml')
-        
-        if zcml:
-            includes_path = os.path.join(location, 'etc', 'package-includes')
-            zcml = zcml.split()
-            if '*' in zcml:
-                zcml.remove('*')
-            else:
-                shutil.rmtree(includes_path)
-                os.mkdir(includes_path)
-
-            n = 0
-            package_match = re.compile('\w+([.]\w+)*$').match
-            for package in zcml:
-                n += 1
-                orig = package
-                if ':' in package:
-                    package, filename = package.split(':')
-                else:
-                    filename = None
-
-                if '-' in package:
-                    package, suff = package.split('-')
-                    if suff not in ('configure', 'meta', 'overrides'):
-                        raise ValueError('Invalid zcml', orig)
-                else:
-                    suff = 'configure'
-
-                if filename is None:
-                    filename = suff + '.zcml'
-
-                if not package_match(package):
-                    raise ValueError('Invalid zcml', orig)
-
-                path = os.path.join(
-                    includes_path,
-                    "%3.3d-%s-%s.zcml" % (n, package, suff),
-                    )
-                open(path, 'w').write(
-                    '<include package="%s" file="%s" />\n'
-                    % (package, filename)
-                    )
 
 # The template used to build zeo.conf
 zope_conf_template="""\
