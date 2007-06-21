@@ -23,31 +23,38 @@ You can use it with a part like this::
 
 The available options are:
 
- zope2-location -- The path where Zope 2 is installed. If you are also
+zope2-location
+  The path where Zope 2 is installed. If you are also
   using the plone.recipe.zope2install recipe, and you have that configured
   as a part called 'zope2' prior to the zope2instance part, you can use
   ${zope2:location} for this parameter.
   
- zeopack -- The path to the zeopack.py backup script. A wrapper for this will 
+zeopack
+  The path to the zeopack.py backup script. A wrapper for this will 
   be generated in bin/zeopack, which sets up the appropriate environment to
   run this. Defaults to "${zope2-location}/utilities/ZODBTools/zeopack.py".
   Set this option to an empty value if you do not want this script to be 
   generated.
   
- zeo-conf -- A relative or absolute path to a zeo.conf file. If this is
+zeo-conf
+  A relative or absolute path to a zeo.conf file. If this is
   not given, a zope.conf will be generated based on the the options below.
   
 The following options all affect the generated zope.conf.
   
- zeo-address -- Give a port for the ZEO server. Defaults to 8100.
+zeo-address
+  Give a port for the ZEO server. Defaults to 8100.
   
- zeo-log -- The filename of the ZEO log file. Defaults to 
+zeo-log
+  The filename of the ZEO log file. Defaults to 
   var/log/${partname}.log
 
- file-storage -- The filename where the ZODB data file will be stored. 
+file-storage
+  The filename where the ZODB data file will be stored. 
   Defaults to var/filestorage/Data.fs.
   
- zope-conf-additional -- Give additional lines to zope.conf. Make sure you
+zope-conf-additional
+  Give additional lines to zope.conf. Make sure you
   indent any lines aftter the one with the parameter.           
 """,
     license = "ZPL 2.1",
