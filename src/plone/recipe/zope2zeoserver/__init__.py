@@ -113,6 +113,9 @@ class Recipe:
             zope_conf = "%%include %s" % os.path.abspath(zope_conf_path)
         else:
             zeo_address = options.get('zeo-address', '8100')
+            effective_user = options.get('effective-user', '')
+            if effective_user:
+               effective_user = 'user %s' % effective_user
             zope_conf_additional = options.get('zope-conf-additional', '')
         
             base_dir = self.buildout['buildout']['directory']
@@ -130,6 +133,7 @@ class Recipe:
                 os.makedirs(file_storage_dir)
             
             zope_conf = zope_conf_template % dict(instance_home = instance_home,
+                                                  effective_user = effective_user,
                                                   z_log = z_log,
                                                   file_storage = file_storage,
                                                   zeo_address = zeo_address,
@@ -226,7 +230,7 @@ zope_conf_template="""\
   exit-codes 0, 2
   directory $INSTANCE
   default-to-interactive true
-  # user zope
+  %(effective_user)s
   #python /usr/bin/python2.4
   #zdrun /opt/Zope-2.9.0/lib/python/zdaemon/zdrun.py
 
