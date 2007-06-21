@@ -177,6 +177,22 @@ class Recipe:
                          % zeo_conf
                          ),
             )
+            
+        # zeopack.py
+        
+        zeopack = options.get('zeopack', None)
+        if zeopack is None:
+            zeopack = os.path.join(options['zope2-location'], 'utilities', 'ZODBTools', 'zeopack.py')
+        
+        directory, filename = os.path.split(zeopack)
+        
+        if zeopack and os.path.exists(zeopack):
+            zc.buildout.easy_install.scripts(
+                [('zeopack', os.path.splitext(filename)[0], 'main')],
+                {}, options['executable'], options['bin-directory'],
+                extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
+                               directory],
+                )
 
 
 # The template used to build zeo.conf
