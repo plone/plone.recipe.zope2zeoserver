@@ -45,6 +45,10 @@ The following options all affect the generated zope.conf.
 zeo-address
   Give a port for the ZEO server. Defaults to 8100.
   
+effective-user
+  The name of the effective user for the ZEO process. Defaults to not setting
+  an effective user.
+  
 zeo-log
   The filename of the ZEO log file. Defaults to 
   var/log/${partname}.log
