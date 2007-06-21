@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 name = "plone.recipe.zope2zeoserver"
-version = '0.2'
+version = '0.3'
 
 setup(
     name = name,
@@ -27,6 +27,12 @@ The available options are:
   using the plone.recipe.zope2install recipe, and you have that configured
   as a part called 'zope2' prior to the zope2instance part, you can use
   ${zope2:location} for this parameter.
+  
+ zeopack -- The path to the zeopack.py backup script. A wrapper for this will 
+  be generated in bin/zeopack, which sets up the appropriate environment to
+  run this. Defaults to "${zope2-location}/utilities/ZODBTools/zeopack.py".
+  Set this option to an empty value if you do not want this script to be 
+  generated.
   
  zeo-conf -- A relative or absolute path to a zeo.conf file. If this is
   not given, a zope.conf will be generated based on the the options below.
