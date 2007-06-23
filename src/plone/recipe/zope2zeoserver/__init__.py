@@ -13,6 +13,7 @@
 ##############################################################################
 
 import os, re, shutil
+from stat import S_IEXEC
 import zc.buildout
 import zc.recipe.egg
 
@@ -67,7 +68,7 @@ class Recipe:
             self.patch_binaries(ws_locations)
 
             # Install extra scripts
-            self.install_scripts(ws_locations)
+            self.install_scripts()
 
             # Add zcml files to package-includes
             self.build_package_includes()
@@ -182,7 +183,7 @@ class Recipe:
             f.write(script)
             f.close()
 
-    def install_scripts(self, ws_locations):
+    def install_scripts(self):
         options = self.options
         location = options['location']
         bindir = options['bin-directory']
@@ -197,11 +198,15 @@ class Recipe:
 
         run_script_path = os.path.join(location, 'run')
         open(run_script_path, 'w').write(run_script)
+        os.chmod(run_script_path, S_IEXEC)
+
+        os.chmod(repozo_path, S_IEXEC)
 
         repozo_script = repozo_script_template % options
 
         repozo_script_path = os.path.join(location, 'bin', 'repozo')
         open(repozo_script_path, 'w').write(repozo_script)
+        os.chmod(repozo_path, S_IEXEC)
 
     def build_package_includes(self):
         """Create ZCML slugs in etc/package-includes
@@ -296,6 +301,26 @@ zope_conf_template="""\
 </runner>
 
 %(zope_conf_additional)s
+"""
+
+repozo_template="""\
+#! /bin/sh
+#
+# wrapper for repozo hot backup script.
+#
+
+PYTHON="%(bin-directory)s/zopepy"
+ZOPE_HOME="%(zope2-location)s"
+INSTANCE_HOME="%(location)s"
+CONFIG_FILE="$INSTANCE_HOME/etc/zope.conf"
+SOFTWARE_HOME="$ZOPE_HOME/lib/python"
+PYTHONPATH="$SOFTWARE_HOME"
+export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
+
+ZOPE_RUN="$SOFTWARE_HOME/Zope2/Startup/run.py"
+REPOZO="$ZOPE_HOME/bin/repozo.py"
+
+exec "$PYTHON" "$REPOZO" "$@"
 """
 
 daemontools_run_template="""\
