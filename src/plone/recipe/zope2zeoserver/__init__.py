@@ -200,13 +200,11 @@ class Recipe:
         open(run_script_path, 'w').write(run_script)
         os.chmod(run_script_path, S_IEXEC)
 
-        os.chmod(repozo_path, S_IEXEC)
-
         repozo_script = repozo_script_template % options
 
         repozo_script_path = os.path.join(location, 'bin', 'repozo')
         open(repozo_script_path, 'w').write(repozo_script)
-        os.chmod(repozo_path, S_IEXEC)
+        os.chmod(repozo_script_path, S_IEXEC)
 
     def build_package_includes(self):
         """Create ZCML slugs in etc/package-includes
