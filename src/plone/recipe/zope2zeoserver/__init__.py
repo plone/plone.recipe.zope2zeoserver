@@ -303,26 +303,6 @@ zope_conf_template="""\
 %(zope_conf_additional)s
 """
 
-repozo_template="""\
-#! /bin/sh
-#
-# wrapper for repozo hot backup script.
-#
-
-PYTHON="%(bin-directory)s/zopepy"
-ZOPE_HOME="%(zope2-location)s"
-INSTANCE_HOME="%(location)s"
-CONFIG_FILE="$INSTANCE_HOME/etc/zope.conf"
-SOFTWARE_HOME="$ZOPE_HOME/lib/python"
-PYTHONPATH="$SOFTWARE_HOME"
-export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
-
-ZOPE_RUN="$SOFTWARE_HOME/Zope2/Startup/run.py"
-REPOZO="$ZOPE_HOME/bin/repozo.py"
-
-exec "$PYTHON" "$REPOZO" "$@"
-"""
-
 daemontools_run_template="""\
 #! /bin/sh
 #
