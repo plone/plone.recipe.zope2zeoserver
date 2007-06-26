@@ -314,12 +314,14 @@ ZOPE_HOME="%(zope2-location)s"
 INSTANCE_HOME="%(location)s"
 CONFIG_FILE="$INSTANCE_HOME/etc/zeo.conf"
 SOFTWARE_HOME="$ZOPE_HOME/lib/python"
+ZODB3_HOME="$SOFTWARE_HOME"
 PYTHONPATH="$SOFTWARE_HOME"
-export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
+export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME ZODB3_HOME
 
-ZOPE_RUN="$SOFTWARE_HOME/Zope2/Startup/run.py"
+ZEOCTL="$ZODB3_HOME/ZEO/zeoctl.py"
 
-exec /command/setuidgid zope "$PYTHON" "$ZOPE_RUN" -C "$CONFIG_FILE" "$@"
+exec /command/setuidgid zope "$PYTHON" "$ZEOCTL" -C "$CONFIG_FILE" "$@"
+#exec "$PYTHON" "$ZEOCTL" -C "$CONFIG_FILE" ${1+"$@"}
 """
 
 repozo_script_template="""\
