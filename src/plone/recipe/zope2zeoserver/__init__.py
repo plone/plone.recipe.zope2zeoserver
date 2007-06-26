@@ -13,9 +13,12 @@
 ##############################################################################
 
 import os, re, shutil
-from stat import S_IRWXG, S_IRWXU
 import zc.buildout
 import zc.recipe.egg
+from stat import S_IRWXG, S_IRWXU, S_ISGID
+
+SUPERVISE_PERMS =  S_IRWXU|S_IRWXG|S_ISGID
+SCRIPT_PERMS =  S_IRWXU|S_IRWXG
 
 class Recipe:
 
@@ -61,6 +64,9 @@ class Recipe:
             open(os.path.join(location, 'etc', '.eggs'), 'w').write(
                 '\n'.join(ws_locations))
 
+            # create daemontools structure
+            self.create_daemontools_structure()
+
             # Make a new zeo.conf based on options in buildout.cfg
             self.build_zope_conf()
             
@@ -104,6 +110,23 @@ class Recipe:
             self.install()
 
         return location
+
+    def create_daemontools_structure(self):
+        options = self.options
+        location = options['location']
+
+        supervise_dir = os.path.join(location,'supervise')
+        log_supervise_dir = os.path.join(location,'log','supervise')
+        log_main_dir = os.path.join(location,'log','main')
+
+        # create daemontools structure
+        os.mkdir(supervise_dir)
+        os.mkdir(log_supervise_dir)
+        os.mkdir(log_main_dir)
+
+        # make sure daemontools' control files are owned by zope
+        os.chmod(supervise_dir, SUPERVISE_PERMS)
+        os.chmod(log_supervise_dir, SUPERVISE_PERMS)
 
     def build_zope_conf(self):
         """Create a zeo.conf file
@@ -199,6 +222,12 @@ class Recipe:
         run_script_path = os.path.join(location, 'run')
         open(run_script_path, 'w').write(run_script)
         os.chmod(run_script_path, S_IRWXU|S_IRWXG)
+
+        log_run_script = daemontools_log_run_template % options
+
+        log_run_script_path = os.path.join(location, 'log', 'run')
+        open(log_run_script_path, 'w').write(log_run_script)
+        os.chmod(log_run_script_path, S_IRWXU|S_IRWXG)
 
         repozo_script = repozo_script_template % options
 
@@ -321,6 +350,10 @@ export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME ZODB3_HOME
 RUNZEO="$ZODB3_HOME/ZEO/runzeo.py"
 
 exec /command/setuidgid zope "$PYTHON" "$RUNZEO" -C "$CONFIG_FILE" "$@"
+"""
+daemontools_log_run_template="""\
+#!/bin/sh
+exec /command/setuidgid zope /usr/local/bin/multilog t ./main
 """
 
 repozo_script_template="""\
