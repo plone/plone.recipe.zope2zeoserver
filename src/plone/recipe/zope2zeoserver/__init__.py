@@ -312,7 +312,7 @@ exec 2>&1
 PYTHON="%(bin-directory)s/zopepy"
 ZOPE_HOME="%(zope2-location)s"
 INSTANCE_HOME="%(location)s"
-CONFIG_FILE="$INSTANCE_HOME/etc/zope.conf"
+CONFIG_FILE="$INSTANCE_HOME/etc/zeo.conf"
 SOFTWARE_HOME="$ZOPE_HOME/lib/python"
 PYTHONPATH="$SOFTWARE_HOME"
 export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
