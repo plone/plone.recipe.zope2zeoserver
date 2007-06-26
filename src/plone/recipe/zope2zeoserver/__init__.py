@@ -13,7 +13,7 @@
 ##############################################################################
 
 import os, re, shutil
-from stat import S_IEXEC
+from stat import S_IRWXG, S_IRWXU
 import zc.buildout
 import zc.recipe.egg
 
@@ -198,13 +198,13 @@ class Recipe:
 
         run_script_path = os.path.join(location, 'run')
         open(run_script_path, 'w').write(run_script)
-        os.chmod(run_script_path, S_IEXEC)
+        os.chmod(run_script_path, S_IRWXU|S_IRWXG)
 
         repozo_script = repozo_script_template % options
 
         repozo_script_path = os.path.join(location, 'bin', 'repozo')
         open(repozo_script_path, 'w').write(repozo_script)
-        os.chmod(repozo_script_path, S_IEXEC)
+        os.chmod(repozo_script_path, S_IRWXU|S_IRWXG)
 
     def build_package_includes(self):
         """Create ZCML slugs in etc/package-includes
@@ -318,10 +318,9 @@ ZODB3_HOME="$SOFTWARE_HOME"
 PYTHONPATH="$SOFTWARE_HOME"
 export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME ZODB3_HOME
 
-ZEOCTL="$ZODB3_HOME/ZEO/zeoctl.py"
+RUNZEO="$ZODB3_HOME/ZEO/runzeo.py"
 
-exec /command/setuidgid zope "$PYTHON" "$ZEOCTL" -C "$CONFIG_FILE" "$@"
-#exec "$PYTHON" "$ZEOCTL" -C "$CONFIG_FILE" ${1+"$@"}
+exec /command/setuidgid zope "$PYTHON" "$RUNZEO" -C "$CONFIG_FILE" "$@"
 """
 
 repozo_script_template="""\
