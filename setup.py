@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 name = "plone.recipe.zope2zeoserver"
-version = '0.6'
+version = '0.7'
 
 setup(
     name = name,
