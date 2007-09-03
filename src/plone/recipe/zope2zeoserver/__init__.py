@@ -185,18 +185,31 @@ class Recipe:
         # zeopack.py
         
         zeopack = options.get('zeopack', None)
-        if zeopack is None:
-            zeopack = os.path.join(options['zope2-location'], 'utilities', 'ZODBTools', 'zeopack.py')
-        
-        directory, filename = os.path.split(zeopack)
-        
-        if zeopack and os.path.exists(zeopack):
+        if zeopack is not None:
+            directory, filename = os.path.split(zeopack)
+            
+            if zeopack and os.path.exists(zeopack):
+                zc.buildout.easy_install.scripts(
+                    [('zeopack', os.path.splitext(filename)[0], 'main')],
+                    {}, options['executable'], options['bin-directory'],
+                    extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
+                                   directory],
+                    )
+        else:
+            zeo_address = options.get('zeo-address', '8100')
+            parts=zeo_address.split(':')
+            if len(parts)==1:
+                parts[0:0]=['127.0.0.1']
             zc.buildout.easy_install.scripts(
-                [('zeopack', os.path.splitext(filename)[0], 'main')],
-                {}, options['executable'], options['bin-directory'],
-                extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
-                               directory],
+                [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
+                ws, options['executable'], options['bin-directory'],
+                extra_paths = extra_paths + [
+                    os.path.join(options['zope2-location'], 'utilities', 'ZODBTools'),
+                    ],
+                initialization='host = "%s"\nport = %s' % tuple(parts),
+                arguments='host, port',
                 )
+
 
 
 # The template used to build zeo.conf
