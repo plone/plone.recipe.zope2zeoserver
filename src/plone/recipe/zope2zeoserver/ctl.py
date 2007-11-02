@@ -11,9 +11,9 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-"""zeocltl -- control a ZEO server using zdaemon.
+"""zeoctl -- control Zope using zdaemon.
 
-Usage: zeocltl [options] [action [arguments]]
+Usage: zeoctl [options] [action [arguments]]
 
 Options:
 -h/--help -- print usage message and exit
@@ -28,14 +28,153 @@ action "help" to find out about available actions.
 """
 
 import os, sys
-from ZEO import zeoctl
+from Zope2.Startup import zopectl
+from Zope2.Startup import handlers
+import ZEO
+import zdaemon.zdctl
 
 WIN32 = False
 if sys.platform[:3].lower() == "win":
     WIN32 = True
 
-# TODO: This all probably needs to be adjusted for Windows in the same way
-# that plone.recipe.zope2instance is
+
+class AdjustedZopeCmd(zopectl.ZopeCmd):
+
+    if WIN32:
+        def get_status(self):
+            self.zd_up = 0
+            self.zd_pid = 0
+            self.zd_status = None
+            return
+
+        def do_install(self, arg):
+            program = "%s install" % self.options.servicescript
+            print program
+            os.system(program)
+
+        def do_remove(self, arg):
+            program = "%s remove" % self.options.servicescript
+            print program
+            os.system(program)
+
+        def do_start(self, arg):
+            program = "%s start" % self.options.servicescript
+            print program
+            os.system(program)
+
+        def do_stop(self, arg):
+            program = "%s stop" % self.options.servicescript
+            print program
+            os.system(program)
+
+        def do_restart(self, arg):
+            program = "%s restart" % self.options.servicescript
+            print program
+            os.system(program)
+
+    def do_foreground(self, arg):
+        if not WIN32:
+            self.get_status()
+            pid = self.zd_pid
+            if pid:
+                print "To run the program in the foreground, please stop it first."
+                return
+        # Quote the program name, so it works even if it contains spaces
+        program = self.options.program
+        program[0] = '"%s"' % program[0]
+        program = " ".join(program)
+        print program
+        try:
+            os.system(program)
+        except KeyboardInterrupt:
+            print
+
+    def do_test(self, arg):
+        # We overwrite the test command to populate the search path
+        # automatically with all configured products and eggs.
+        args = filter(None, arg.split(' '))
+
+        defaults = []
+
+        # Put everything on sys.path into the test-path.
+        # XXX This might be too much, but ensures all activated eggs are found.
+        # What we really would want here, is to put only the eggs onto the
+        # test-path
+
+        # XXX Somehow the buildout root gets on the sys.path. This causes
+        # weird problems, as packages like src.plone.portlets.plone.portlets
+        # are found by the testrunner
+        paths = sys.path
+        progname = self.options.progname
+        buildout_root =  os.path.split(os.path.dirname(progname))[0]
+        paths = [p for p in paths if p != buildout_root]
+
+        # If we have a package filter, we don't put any packages on the test
+        # path that do not match the package filter
+        package = None
+        if '-s' in args:
+            index = args.index('-s')
+            if len(args) > index:
+                package = args[index + 1]
+        for path in paths:
+            if package is not None:
+                if package in path:
+                    defaults += ['--test-path', path]
+            else:
+                defaults += ['--test-path', path]
+
+        # Default to dots, if not explicitly set to quiet. Don't duplicate
+        # the -v if it is specified manually.
+        if '-v' not in args and '-q' not in args:
+            defaults.append('-v')
+
+        # Run the testrunner. Calling it directly ensures that it is executed
+        # in the same environment that we just carefully configured.
+        import zope.testing.testrunner
+        args.insert(0, zope.testing.testrunner.__file__)
+        zope.testing.testrunner.run(defaults, args)
 
 def main(args=None):
-    zeoctl.main(args)
+    options = zdaemon.zdctl.ZDCtlOptions()
+    options.schemadir = os.path.dirname(ZEO.__file__)
+    options.schemafile = "zeoctl.xml"
+
+    # This is mainly a copy of zopectl.py's main function from Zope2.Startup
+    #options = zopectl.ZopeCtlOptions()
+    # Realize arguments and set documentation which is used in the -h option
+    options.realize(args, doc=__doc__)
+    # We use our own ZopeCmd set, that is derived from the original one.
+    c = AdjustedZopeCmd(options)
+
+    # We need to apply a number of hacks to make things work:
+
+    # This puts amongst other things all the configured products directories
+    # into the Products.__path__ so we can put those on the test path
+    #handlers.root_handler(options.configroot)
+
+    # We need to apply the configuration in one more place
+    #import App.config
+    #App.config.setConfiguration(options.configroot)
+
+    # The PYTHONPATH is not set, so all commands starting a new shell fail
+    # unless we set it explicitly
+    os.environ['PYTHONPATH'] = os.path.pathsep.join(sys.path)
+
+    # Add the path to the zopeservice.py script, which is needed for some of the
+    # Windows specific commands
+    servicescript = os.path.join(options.configroot.runner.directory, 'bin', 'zopeservice.py')
+    options.servicescript = '"%s" %s' % (options.python, servicescript)
+
+    # If no command was specified we go into interactive mode.
+    if options.args:
+        c.onecmd(" ".join(options.args))
+    else:
+        options.interactive = 1
+    if options.interactive:
+        try:
+            import readline
+        except ImportError:
+            pass
+        print "program:", " ".join(options.program)
+        c.do_status()
+        c.cmdloop()
