@@ -362,8 +362,6 @@ repozo_script_template="""\
 # run script for zope under djb daemontools
 #
 
-exec 2>&1
-
 PYTHON="%(bin-directory)s/zopepy"
 ZOPE_HOME="%(zope2-location)s"
 INSTANCE_HOME="%(location)s"
@@ -372,7 +370,7 @@ SOFTWARE_HOME="$ZOPE_HOME/lib/python"
 PYTHONPATH="$SOFTWARE_HOME"
 export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
 
-REPOZO="$ZOPE_HOME/bin/repozo.py"
+REPOZO="$ZOPE_HOME/utilities/ZODBTools/repozo.py"
 
-exec /command/setuidgid zope "$PYTHON" "$REPOZO" -C "$CONFIG_FILE" "$@"
+"$PYTHON" "$REPOZO" "$@"
 """
