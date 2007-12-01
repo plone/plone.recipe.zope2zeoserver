@@ -372,5 +372,5 @@ export PYTHONPATH INSTANCE_HOME SOFTWARE_HOME
 
 REPOZO="$ZOPE_HOME/utilities/ZODBTools/repozo.py"
 
-"$PYTHON" "$REPOZO" "$@"
+exec "$PYTHON" "$REPOZO" "$@"
 """
