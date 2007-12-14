@@ -116,6 +116,7 @@ class Recipe:
             effective_user = options.get('effective-user', '')
             if effective_user:
                effective_user = 'user %s' % effective_user
+            socket_name = options.get('socket-name', '$INSTANCE/etc/zeo.zdsock')
             zope_conf_additional = options.get('zope-conf-additional', '')
         
             base_dir = self.buildout['buildout']['directory']
@@ -134,6 +135,7 @@ class Recipe:
             
             zope_conf = zope_conf_template % dict(instance_home = instance_home,
                                                   effective_user = effective_user,
+                                                  socket_name = socket_name,
                                                   z_log = z_log,
                                                   file_storage = file_storage,
                                                   zeo_address = zeo_address,
@@ -236,7 +238,7 @@ zope_conf_template="""\
 
 <runner>
   program $INSTANCE/bin/runzeo
-  socket-name $INSTANCE/etc/zeo.zdsock
+  socket-name %(socket_name)s
   daemon true
   forever false
   backoff-limit 10
