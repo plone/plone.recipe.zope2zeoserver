@@ -44,6 +44,10 @@ zeo-log
 file-storage
   The filename where the ZODB data file will be stored. 
   Defaults to var/filestorage/Data.fs.
+
+socket-name
+  The filename where ZEO will write its socket file.
+  Defaults to $INSTANCE/etc/zeo.zdsock.
   
 zope-conf-additional
   Give additional lines to zope.conf. Make sure you
