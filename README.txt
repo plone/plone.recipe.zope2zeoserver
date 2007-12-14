@@ -47,7 +47,7 @@ file-storage
 
 socket-name
   The filename where ZEO will write its socket file.
-  Defaults to $INSTANCE/etc/zeo.zdsock.
+  Defaults to var/zeo.zdsock.
   
 zope-conf-additional
   Give additional lines to zope.conf. Make sure you

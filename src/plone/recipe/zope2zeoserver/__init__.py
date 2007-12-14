@@ -116,10 +116,14 @@ class Recipe:
             effective_user = options.get('effective-user', '')
             if effective_user:
                effective_user = 'user %s' % effective_user
-            socket_name = options.get('socket-name', '$INSTANCE/etc/zeo.zdsock')
             zope_conf_additional = options.get('zope-conf-additional', '')
         
             base_dir = self.buildout['buildout']['directory']
+
+            socket_name = options.get('socket-name', '%s/var/zeo.zdsock' % base_dir)
+            socket_dir = os.path.dirname(socket_name)
+            if not os.path.exists(socket_dir):
+                os.makedirs(socket_dir)
         
             z_log_name = options.get('zeo-log', os.path.sep.join(('var', 'log', self.name + '.log',)))
             z_log = os.path.join(base_dir, z_log_name)
