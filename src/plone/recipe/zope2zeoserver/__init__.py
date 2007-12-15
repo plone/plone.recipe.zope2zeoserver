@@ -250,8 +250,6 @@ zope_conf_template="""\
   directory $INSTANCE
   default-to-interactive true
   %(effective_user)s
-  #python /usr/bin/python2.4
-  #zdrun /opt/Zope-2.9.0/lib/python/zdaemon/zdrun.py
 
   # This logfile should match the one in the zeo.conf file.
   # It is used by zdctl's logtail command, zdrun/zdctl doesn't write it.
