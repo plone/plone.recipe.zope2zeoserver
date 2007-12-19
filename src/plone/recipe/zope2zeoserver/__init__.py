@@ -136,6 +136,13 @@ class Recipe:
             file_storage_dir = os.path.dirname(file_storage)
             if not os.path.exists(file_storage_dir):
                 os.makedirs(file_storage_dir)
+
+            pid_file = options.get(
+                'pid-file',
+                os.path.join(base_dir, 'var', self.name + '.pid'))
+            lock_file = options.get(
+                'lock-file',
+                os.path.join(base_dir, 'var', self.name + '.lock'))
             
             zope_conf = zope_conf_template % dict(instance_home = instance_home,
                                                   effective_user = effective_user,
@@ -143,6 +150,8 @@ class Recipe:
                                                   z_log = z_log,
                                                   file_storage = file_storage,
                                                   zeo_address = zeo_address,
+                                                  pid_file = pid_file,
+                                                  lock_file = lock_file,
                                                   zope_conf_additional = zope_conf_additional,)
         
         zope_conf_path = os.path.join(location, 'etc', 'zeo.conf')
@@ -226,6 +235,8 @@ zope_conf_template="""\
   address %(zeo_address)s
   read-only false
   invalidation-queue-size 100
+  pid-filename %(pid_file)s
+  lock-filename %(lock_file)s
 </zeo>
 
 <filestorage 1>
