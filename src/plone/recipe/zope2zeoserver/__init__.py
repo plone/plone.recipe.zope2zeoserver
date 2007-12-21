@@ -59,7 +59,7 @@ class Recipe:
 
             # Make a new zeo.conf based on options in buildout.cfg
             self.build_zeo_conf()
-            
+
             # Patch extra paths into binaries
             self.patch_binaries(ws_locations)
 
@@ -102,12 +102,10 @@ class Recipe:
     def build_zeo_conf(self):
         """Create a zeo.conf file
         """
-        
         options = self.options
         location = options['location']
-        
         instance_home = location
-        
+
         zope_conf_path = options.get('zeo-conf', None)
         if zope_conf_path is not None:
             zope_conf = "%%include %s" % os.path.abspath(zope_conf_path)
@@ -116,21 +114,21 @@ class Recipe:
             effective_user = options.get('effective-user', '')
             if effective_user:
                effective_user = 'user %s' % effective_user
-            zope_conf_additional = options.get('zope-conf-additional', '')
-        
-            base_dir = self.buildout['buildout']['directory']
 
+            zope_conf_additional = options.get('zope-conf-additional', '')
+
+            base_dir = self.buildout['buildout']['directory']
             socket_name = options.get('socket-name', '%s/var/zeo.zdsock' % base_dir)
             socket_dir = os.path.dirname(socket_name)
             if not os.path.exists(socket_dir):
                 os.makedirs(socket_dir)
-        
+
             z_log_name = options.get('zeo-log', os.path.sep.join(('var', 'log', self.name + '.log',)))
             z_log = os.path.join(base_dir, z_log_name)
             z_log_dir = os.path.dirname(z_log)
             if not os.path.exists(z_log_dir):
                 os.makedirs(z_log_dir)
-            
+
             file_storage = options.get('file-storage', os.path.sep.join(('var', 'filestorage', 'Data.fs',)))
             file_storage = os.path.join(base_dir, file_storage)
             file_storage_dir = os.path.dirname(file_storage)
@@ -140,10 +138,7 @@ class Recipe:
             pid_file = options.get(
                 'pid-file',
                 os.path.join(base_dir, 'var', self.name + '.pid'))
-            lock_file = options.get(
-                'lock-file',
-                os.path.join(base_dir, 'var', self.name + '.lock'))
-            
+
             zope_conf = zope_conf_template % dict(instance_home = instance_home,
                                                   effective_user = effective_user,
                                                   socket_name = socket_name,
@@ -151,12 +146,11 @@ class Recipe:
                                                   file_storage = file_storage,
                                                   zeo_address = zeo_address,
                                                   pid_file = pid_file,
-                                                  lock_file = lock_file,
                                                   zope_conf_additional = zope_conf_additional,)
-        
+
         zope_conf_path = os.path.join(location, 'etc', 'zeo.conf')
         open(zope_conf_path, 'w').write(zope_conf)
-        
+
     def patch_binaries(self, ws_locations):
         location = self.options['location']
         # XXX We need to patch the windows specific batch scripts
@@ -176,15 +170,16 @@ class Recipe:
     def install_scripts(self, ws_locations):
         options = self.options
         location = options['location']
-        
+
         zeo_conf = options.get('zeo-conf', None)
-        
-        zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
+        if zeo_conf is None:
+            zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
+
         extra_paths = [os.path.join(location),
                        os.path.join(options['zope2-location'], 'lib', 'python')
                       ]
         extra_paths.extend(ws_locations)
-        
+
         requirements, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
 
         zc.buildout.easy_install.scripts(
@@ -196,13 +191,10 @@ class Recipe:
                          % zeo_conf
                          ),
             )
-            
         # zeopack.py
-        
         zeopack = options.get('zeopack', None)
         if zeopack is not None:
             directory, filename = os.path.split(zeopack)
-            
             if zeopack and os.path.exists(zeopack):
                 zc.buildout.easy_install.scripts(
                     [('zeopack', os.path.splitext(filename)[0], 'main')],
@@ -212,9 +204,9 @@ class Recipe:
                     )
         else:
             zeo_address = options.get('zeo-address', '8100')
-            parts=zeo_address.split(':')
-            if len(parts)==1:
-                parts[0:0]=['127.0.0.1']
+            parts = zeo_address.split(':')
+            if len(parts) == 1:
+                parts[0:0] = ['127.0.0.1']
             zc.buildout.easy_install.scripts(
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
                 ws, options['executable'], options['bin-directory'],
@@ -225,8 +217,6 @@ class Recipe:
                 arguments='host, port',
                 )
 
-
-
 # The template used to build zeo.conf
 zope_conf_template="""\
 %%define INSTANCE %(instance_home)s
@@ -236,7 +226,6 @@ zope_conf_template="""\
   read-only false
   invalidation-queue-size 100
   pid-filename %(pid_file)s
-  lock-filename %(lock_file)s
 </zeo>
 
 <filestorage 1>
