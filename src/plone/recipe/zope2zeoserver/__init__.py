@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-import os, re, shutil
+import sys, os, re, shutil
 import zc.buildout
 import zc.recipe.egg
 
@@ -29,47 +29,76 @@ class Recipe:
         options['bin-directory'] = buildout['buildout']['bin-directory']
         options['scripts'] = '' # suppress script generation.
 
+        requirements, self.zodb_ws = self.egg.working_set()
+        self.ws_locations = [d.location for d in self.zodb_ws]
+        # account for zope2-location, if provided
+        if options.get('zope2-location') is not None:
+            software_home = os.path.join(options['zope2-location'],
+                                         'lib', 'python')
+            if os.path.isdir(software_home):
+                self.ws_locations.append(software_home)
+
+
     def install(self):
         options = self.options
         location = options['location']
 
-        requirements, ws = self.egg.working_set()
-        ws_locations = [d.location for d in ws]
+        # evil hack alert!
+        # hopefully place ZODB in sys.path
+        orig_sys_path = tuple(sys.path)
+        sys.path[0:0] = self.ws_locations
+        try:
+            # if we can import ZEO, assume the depenencies (zdaemon, ZConfig,
+            # etc...) are also present on 'path'
+            import ZEO
+        except ImportError:
+            raise AssertionError(zodb_import_msg)
 
         if os.path.exists(location):
             shutil.rmtree(location)
 
         # What follows is a bit of a hack because the instance-setup mechanism
-        # is a bit monolithic. We'll run mkzeoinstance and then we'll
+        # is a bit monolithic. We'll run mkzeoinst and then we'll
         # patch the result. A better approach might be to provide independent
         # instance-creation logic, but this raises lots of issues that
         # need to be stored out first.
-        mkzeoinstance = os.path.join(options['zope2-location'],
-                                     'utilities', 'mkzeoinstance.py')
-
-        assert os.spawnl(
-            os.P_WAIT, options['executable'], options['executable'],
-            mkzeoinstance, location,
-            ) == 0
+        
+        # this was taken from mkzeoinstance.py
+        from ZEO.mkzeoinst import ZEOInstanceBuilder
+        
+        zodb3_home = os.path.dirname(os.path.dirname(ZEO.__file__))
+        params = {
+            "package": "zeo",
+            "PACKAGE": "ZEO",
+            "zodb3_home": zodb3_home,
+            "instance_home": location,
+            "port": 8100, # will be overwritten later
+            "python": options['executable'],
+            }
+        ZEOInstanceBuilder().create(location, params)
 
         try:
             # Save the working set:
             open(os.path.join(location, 'etc', '.eggs'), 'w').write(
-                '\n'.join(ws_locations))
+                '\n'.join(self.ws_locations))
 
             # Make a new zeo.conf based on options in buildout.cfg
             self.build_zeo_conf()
 
             # Patch extra paths into binaries
-            self.patch_binaries(ws_locations)
+            self.patch_binaries()
 
             # Install extra scripts
-            self.install_scripts(ws_locations)
+            self.install_scripts()
 
         except:
             # clean up
             shutil.rmtree(location)
             raise
+
+        # end evil hack and restore sys.path to it's glorious days
+        del sys.path[0:len(self.ws_locations)]
+        assert tuple(sys.path) == orig_sys_path
 
         return location
 
@@ -81,7 +110,7 @@ class Recipe:
         ws_locations = [d.location for d in ws]
 
         if os.path.exists(location):
-            # See is we can stop. We need to see if the working set path
+            # See if we can stop. We need to see if the working set path
             # has changed.
             saved_path = os.path.join(location, 'etc', '.eggs')
             if os.path.isfile(saved_path):
@@ -106,16 +135,16 @@ class Recipe:
         location = options['location']
         instance_home = location
 
-        zope_conf_path = options.get('zeo-conf', None)
-        if zope_conf_path is not None:
-            zope_conf = "%%include %s" % os.path.abspath(zope_conf_path)
+        zeo_conf_path = options.get('zeo-conf', None)
+        if zeo_conf_path is not None:
+            zeo_conf = "%%include %s" % os.path.abspath(zeo_conf_path)
         else:
             zeo_address = options.get('zeo-address', '8100')
             effective_user = options.get('effective-user', '')
             if effective_user:
                effective_user = 'user %s' % effective_user
 
-            zope_conf_additional = options.get('zope-conf-additional', '')
+            zeo_conf_additional = options.get('zeo-conf-additional', '')
 
             base_dir = self.buildout['buildout']['directory']
             socket_name = options.get('socket-name', '%s/var/zeo.zdsock' % base_dir)
@@ -138,36 +167,42 @@ class Recipe:
             pid_file = options.get(
                 'pid-file',
                 os.path.join(base_dir, 'var', self.name + '.pid'))
-
-            zope_conf = zope_conf_template % dict(instance_home = instance_home,
+            # check whether we'll wrap a blob storage around our file storage
+            blob_storage = options.get('blob-storage')
+            storage_options = dict(file_storage = file_storage,
+                                   blob_storage = blob_storage)
+            if blob_storage:
+                storage_template = blob_storage_template
+            else:
+                storage_template = file_storage_template
+            storage = storage_template % storage_options
+            zeo_conf = zeo_conf_template % dict(instance_home = instance_home,
                                                   effective_user = effective_user,
                                                   socket_name = socket_name,
                                                   z_log = z_log,
-                                                  file_storage = file_storage,
+                                                  storage = storage,
                                                   zeo_address = zeo_address,
                                                   pid_file = pid_file,
-                                                  zope_conf_additional = zope_conf_additional,)
+                                                  zeo_conf_additional = zeo_conf_additional,)
 
-        zope_conf_path = os.path.join(location, 'etc', 'zeo.conf')
-        open(zope_conf_path, 'w').write(zope_conf)
+        zeo_conf_path = os.path.join(location, 'etc', 'zeo.conf')
+        open(zeo_conf_path, 'w').write(zeo_conf)
 
-    def patch_binaries(self, ws_locations):
+    def patch_binaries(self):
         location = self.options['location']
         # XXX We need to patch the windows specific batch scripts
         # and they need a different path seperator
-        path =":".join(ws_locations)
+        path = os.path.pathsep.join(self.ws_locations)
         for script_name in ('runzeo', 'zeoctl'):
             script_path = os.path.join(location, 'bin', script_name)
             script = open(script_path).read()
-            script = script.replace(
-                '$SOFTWARE_HOME:$PYTHONPATH',
-                '$SOFTWARE_HOME:'+path+':$PYTHONPATH'
-                )
+            script = script.replace('PYTHONPATH="$ZODB3_HOME"',
+                                    'PYTHONPATH="%s"' % path)
             f = open(script_path, 'w')
             f.write(script)
             f.close()
 
-    def install_scripts(self, ws_locations):
+    def install_scripts(self):
         options = self.options
         location = options['location']
 
@@ -175,17 +210,12 @@ class Recipe:
         if zeo_conf is None:
             zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
 
-        extra_paths = [os.path.join(location),
-                       os.path.join(options['zope2-location'], 'lib', 'python')
-                      ]
-        extra_paths.extend(ws_locations)
-
         requirements, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
 
         zc.buildout.easy_install.scripts(
             [(self.name, 'plone.recipe.zope2zeoserver.ctl', 'main')],
             ws, options['executable'], options['bin-directory'],
-            extra_paths = extra_paths,
+            extra_paths = self.ws_locations,
             arguments = ('\n        ["-C", %r]'
                          '\n        + sys.argv[1:]'
                          % zeo_conf
@@ -199,8 +229,7 @@ class Recipe:
                 zc.buildout.easy_install.scripts(
                     [('zeopack', os.path.splitext(filename)[0], 'main')],
                     {}, options['executable'], options['bin-directory'],
-                    extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
-                                   directory],
+                    extra_paths = self.ws_locations + [directory],
                     )
         else:
             zeo_address = options.get('zeo-address', '8100')
@@ -209,16 +238,36 @@ class Recipe:
                 parts[0:0] = ['127.0.0.1']
             zc.buildout.easy_install.scripts(
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
-                ws, options['executable'], options['bin-directory'],
-                extra_paths = extra_paths + [
-                    os.path.join(options['zope2-location'], 'utilities', 'ZODBTools'),
-                    ],
+                self.zodb_ws, options['executable'], options['bin-directory'],
                 initialization='host = "%s"\nport = %s' % tuple(parts),
                 arguments='host, port',
                 )
 
+zodb_import_msg = """
+Unable to import ZEO. Please, either add the ZODB3 egg to the 'eggs' entry or
+set zope2-location
+""".strip()
+
+# the template used to build a regular file storage entry for zeo.conf
+file_storage_template = """
+<filestorage 1>
+  path %(file_storage)s
+</filestorage>
+""".strip()
+
+# the template used to build a blob storage wrapping a file storage entry for
+# zeo.conf
+blob_storage_template = """
+<blobstorage 1>
+  blob-dir %(blob_storage)s
+  <filestorage 1>
+    path %(file_storage)s
+  </filestorage>
+</blobstorage>
+""".strip()
+
 # The template used to build zeo.conf
-zope_conf_template="""\
+zeo_conf_template="""\
 %%define INSTANCE %(instance_home)s
 
 <zeo>
@@ -228,9 +277,7 @@ zope_conf_template="""\
   pid-filename %(pid_file)s
 </zeo>
 
-<filestorage 1>
-  path %(file_storage)s
-</filestorage>
+%(storage)s
 
 <eventlog>
   level info
@@ -256,5 +303,5 @@ zope_conf_template="""\
   logfile %(z_log)s
 </runner>
 
-%(zope_conf_additional)s
+%(zeo_conf_additional)s
 """

@@ -1,7 +1,7 @@
 # zeopack wrapper
 
 import sys
-import zeopack
+from ZEO.scripts import zeopack
 
 def main(host, port):
     for arg in sys.argv:
