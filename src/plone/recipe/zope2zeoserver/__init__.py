@@ -212,10 +212,14 @@ class Recipe:
 
         requirements, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
 
+        initialization = """
+        import os; os.environ['PYTHONPATH'] = '%s'
+        """.strip() % os.path.pathsep.join(self.ws_locations)
         zc.buildout.easy_install.scripts(
             [(self.name, 'plone.recipe.zope2zeoserver.ctl', 'main')],
             ws, options['executable'], options['bin-directory'],
             extra_paths = self.ws_locations,
+            initialization = initialization,
             arguments = ('\n        ["-C", %r]'
                          '\n        + sys.argv[1:]'
                          % zeo_conf
