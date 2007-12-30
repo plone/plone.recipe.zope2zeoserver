@@ -41,8 +41,14 @@ effective-user
   The name of the effective user for the ZEO process. Defaults to not setting
   an effective user.
 
+invalidation-queue-size
+  The invalidation-queue-size used for the ZEO server. Defaults to 100.
+
 zeo-log
   The filename of the ZEO log file. Defaults to var/log/${partname}.log
+
+storage-number
+  The number used to identify a storage.
 
 file-storage
   The filename where the ZODB data file will be stored. 

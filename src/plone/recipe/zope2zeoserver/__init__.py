@@ -140,25 +140,32 @@ class Recipe:
             zeo_conf = "%%include %s" % os.path.abspath(zeo_conf_path)
         else:
             zeo_address = options.get('zeo-address', '8100')
+            zeo_conf_additional = options.get('zeo-conf-additional', '')
+            storage_number = options.get('storage-number', '1')
+
             effective_user = options.get('effective-user', '')
             if effective_user:
                effective_user = 'user %s' % effective_user
 
-            zeo_conf_additional = options.get('zeo-conf-additional', '')
+            invalidation_queue_size = options.get('invalidation-queue-size',
+                                                  '100')
 
             base_dir = self.buildout['buildout']['directory']
-            socket_name = options.get('socket-name', '%s/var/zeo.zdsock' % base_dir)
+            socket_name = options.get('socket-name',
+                                      '%s/var/zeo.zdsock' % base_dir)
             socket_dir = os.path.dirname(socket_name)
             if not os.path.exists(socket_dir):
                 os.makedirs(socket_dir)
 
-            z_log_name = options.get('zeo-log', os.path.sep.join(('var', 'log', self.name + '.log',)))
+            z_log_name = os.path.sep.join(('var', 'log', self.name + '.log',))
+            z_log_name = options.get('zeo-log', z_log_name)
             z_log = os.path.join(base_dir, z_log_name)
             z_log_dir = os.path.dirname(z_log)
             if not os.path.exists(z_log_dir):
                 os.makedirs(z_log_dir)
 
-            file_storage = options.get('file-storage', os.path.sep.join(('var', 'filestorage', 'Data.fs',)))
+            file_storage = os.path.sep.join(('var', 'filestorage', 'Data.fs',))
+            file_storage = options.get('file-storage', file_storage)
             file_storage = os.path.join(base_dir, file_storage)
             file_storage_dir = os.path.dirname(file_storage)
             if not os.path.exists(file_storage_dir):
@@ -167,23 +174,31 @@ class Recipe:
             pid_file = options.get(
                 'pid-file',
                 os.path.join(base_dir, 'var', self.name + '.pid'))
+
             # check whether we'll wrap a blob storage around our file storage
             blob_storage = options.get('blob-storage', None)
-            storage_options = dict(file_storage = file_storage,
-                                   blob_storage = blob_storage)
             if blob_storage is not None:
                 storage_template = blob_storage_template
             else:
                 storage_template = file_storage_template
-            storage = storage_template % storage_options
-            zeo_conf = zeo_conf_template % dict(instance_home = instance_home,
-                                                  effective_user = effective_user,
-                                                  socket_name = socket_name,
-                                                  z_log = z_log,
-                                                  storage = storage,
-                                                  zeo_address = zeo_address,
-                                                  pid_file = pid_file,
-                                                  zeo_conf_additional = zeo_conf_additional,)
+
+            storage = storage_template % dict(
+                storage_number = storage_number,
+                file_storage = file_storage,
+                blob_storage = blob_storage
+                )
+
+            zeo_conf = zeo_conf_template % dict(
+                instance_home = instance_home,
+                effective_user = effective_user,
+                invalidation_queue_size = invalidation_queue_size,
+                socket_name = socket_name,
+                z_log = z_log,
+                storage = storage,
+                zeo_address = zeo_address,
+                pid_file = pid_file,
+                zeo_conf_additional = zeo_conf_additional,
+                )
 
         zeo_conf_path = os.path.join(location, 'etc', 'zeo.conf')
         open(zeo_conf_path, 'w').write(zeo_conf)
@@ -254,7 +269,7 @@ set zope2-location
 
 # the template used to build a regular file storage entry for zeo.conf
 file_storage_template = """
-<filestorage 1>
+<filestorage %(storage_number)s>
   path %(file_storage)s
 </filestorage>
 """.strip()
@@ -262,9 +277,9 @@ file_storage_template = """
 # the template used to build a blob storage wrapping a file storage entry for
 # zeo.conf
 blob_storage_template = """
-<blobstorage 1>
+<blobstorage %(storage_number)s>
   blob-dir %(blob_storage)s
-  <filestorage 1>
+  <filestorage %(storage_number)s>
     path %(file_storage)s
   </filestorage>
 </blobstorage>
@@ -277,7 +292,7 @@ zeo_conf_template="""\
 <zeo>
   address %(zeo_address)s
   read-only false
-  invalidation-queue-size 100
+  invalidation-queue-size %(invalidation_queue_size)s
   pid-filename %(pid_file)s
 </zeo>
 

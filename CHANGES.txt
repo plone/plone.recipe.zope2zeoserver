@@ -4,6 +4,9 @@ Change History
 0.9 (unreleased)
 ----------------
 
+- Added `invalidation-queue-size` and `storage-number` options.
+  [hannosch]
+
 - Merged rochael-blobsupport branch. Added support for ZODB 3.8 blob storage
   configuration. This adds the blob-storage option. This closes
   https://bugs.launchpad.net/collective.buildout/+bug/179113.
