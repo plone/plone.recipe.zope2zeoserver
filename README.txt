@@ -48,12 +48,15 @@ file-storage
   The filename where the ZODB data file will be stored. 
   Defaults to var/filestorage/Data.fs.
 
+blob-storage
+  The folder where the ZODB blob data files will be stored.
+
 socket-name
   The filename where ZEO will write its socket file.
   Defaults to var/zeo.zdsock.
 
-zope-conf-additional
-  Give additional lines to zope.conf. Make sure you indent any lines after
+zeo-conf-additional
+  Give additional lines to zeo.conf. Make sure you indent any lines after
   the one with the parameter.           
 
 Reporting bugs or asking questions
