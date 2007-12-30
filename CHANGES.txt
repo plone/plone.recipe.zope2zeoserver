@@ -1,11 +1,12 @@
 Change History
 ==============
 
-0.9
----
+0.9 (unreleased)
+----------------
 
 - Merged rochael-blobsupport branch. Added support for ZODB 3.8 blob storage
-  configuration. This adds the blob-storage option.
+  configuration. This adds the blob-storage option. This closes
+  https://bugs.launchpad.net/collective.buildout/+bug/179113.
   [rochael, hannosch]
 
 - Renamed `zope-conf-additional` option to `zeo-conf-additional`.
