@@ -29,15 +29,21 @@ class Recipe:
         options['bin-directory'] = buildout['buildout']['bin-directory']
         options['scripts'] = '' # suppress script generation.
 
-        requirements, self.zodb_ws = self.egg.working_set()
-        self.ws_locations = [d.location for d in self.zodb_ws]
-        # account for zope2-location, if provided
-        if options.get('zope2-location') is not None:
-            software_home = os.path.join(options['zope2-location'],
-                                         'lib', 'python')
-            if os.path.isdir(software_home):
-                self.ws_locations.append(software_home)
+        _, self.zodb_ws = self.egg.working_set()
 
+    _ws_locations = None
+
+    @property
+    def ws_locations(self):
+        if self._ws_locations is None:
+            self._ws_locations = [d.location for d in self.zodb_ws]
+            # account for zope2-location, if provided
+            if self.options.get('zope2-location') is not None:
+                software_home = os.path.join(self.options['zope2-location'],
+                                             'lib', 'python')
+                assert os.path.isdir(software_home), invalid_z2_location_msg
+                self._ws_locations.append(software_home)
+        return self._ws_locations
 
     def install(self):
         options = self.options
@@ -106,16 +112,13 @@ class Recipe:
         options = self.options
         location = options['location']
 
-        requirements, ws = self.egg.working_set()
-        ws_locations = [d.location for d in ws]
-
         if os.path.exists(location):
             # See if we can stop. We need to see if the working set path
             # has changed.
             saved_path = os.path.join(location, 'etc', '.eggs')
             if os.path.isfile(saved_path):
                 if (open(saved_path).read() !=
-                    '\n'.join(ws_locations)
+                    '\n'.join(self.ws_locations)
                     ):
                     # Something has changed. Blow away the instance.
                     self.install()
@@ -225,7 +228,7 @@ class Recipe:
         if zeo_conf is None:
             zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
 
-        requirements, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
+        _, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
 
         initialization = """
         import os; os.environ['PYTHONPATH'] = %r
@@ -261,6 +264,12 @@ class Recipe:
                 initialization='host = "%s"\nport = %s' % tuple(parts),
                 arguments='host, port',
                 )
+
+invalid_z2_location_msg = """
+'zope2-location' doesn't point to an actual Zope2 SOFTWARE_HOME. Check this
+setting and, eventually, make sure this buildout part is being run after the
+part that is supposed to provide the 'zope2-location' value.
+""".strip()
 
 zodb_import_msg = """
 Unable to import ZEO. Please, either add the ZODB3 egg to the 'eggs' entry or

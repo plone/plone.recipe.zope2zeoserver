@@ -18,8 +18,9 @@ Options
 zope2-location
   The path where Zope 2 is installed. If you are also using the
   plone.recipe.zope2install recipe, and you have that configured as a part
-  called 'zope2' prior to the zope2instance part, you can use
-  ${zope2:location} for this parameter.
+  called 'zope2' prior to the zope2zeoserver part, you can use
+  ${zope2:location} for this parameter. You must ensure the zope2zeoserver part
+  is run *after* the zope2install one.
 
 zeopack
   The path to the zeopack.py backup script. A wrapper for this will be
