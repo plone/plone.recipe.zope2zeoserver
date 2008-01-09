@@ -1,8 +1,8 @@
 Change History
 ==============
 
-0.10 (unreleased)
------------------
+0.10
+----
 
 - Calculate the package working set outside of the recipe constructor. Closes
   https://bugs.launchpad.net/collective.buildout/+bug/180084
