@@ -33,7 +33,7 @@ Let's run it::
     Generated script '.../bin/zeo'.
     Generated script '.../bin/zeopack'.
 
-We should have a zope instance, with a basic zeo.conf::
+We should have a basic zeo.conf::
 
     >>> zeo = os.path.join(sample_buildout, 'parts', 'zeo')
     >>> print open(os.path.join(zeo, 'etc', 'zeo.conf')).read()
@@ -77,3 +77,56 @@ We should have a zope instance, with a basic zeo.conf::
     <BLANKLINE>
     <BLANKLINE>
 
+Custom Zeo log
+==============
+
+`zeo-log-custom` is a new option that allows you to create
+a custom zeo log section. For example, let's say you want
+to use `rotatezlogs`::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... parts = zeo
+    ... develop = 
+    ...     %(recipe_location)s 
+    ...
+    ... [zeo]
+    ... recipe = plone.recipe.zope2zeoserver
+    ... 
+    ... zeo-log-custom =
+    ...     %%import iw.rotatezlogs
+    ...     <rotatelogfile>
+    ...         path %(sample_buildout)s/var/log/zeo.log
+    ...         max-bytes 1MB
+    ...         backup-count 5
+    ...     </rotatelogfile>
+    ... 
+    ... ''' % globals())
+
+Let's run it::
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '/Users/repos/svn.plone.org/plone.recipe.zope2zeoserver'
+    Uninstalling zeo.
+    Installing zeo.
+    ...
+    Changed mode for ...runzeo to 755
+
+We should have a zeo.conf with a rotatezlog::
+
+    >>> zeo = os.path.join(sample_buildout, 'parts', 'zeo')
+    >>> print open(os.path.join(zeo, 'etc', 'zeo.conf')).read()
+     %define INSTANCE ...
+    ...
+    <eventlog>
+      level info
+      %import iw.rotatezlogs
+      <rotatelogfile>
+        path ...zeo.log
+        max-bytes 1MB
+        backup-count 5
+      </rotatelogfile>
+    </eventlog>
+    ...
+    <BLANKLINE>

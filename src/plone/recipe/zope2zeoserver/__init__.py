@@ -161,11 +161,21 @@ class Recipe:
                 os.makedirs(socket_dir)
 
             z_log_name = os.path.sep.join(('var', 'log', self.name + '.log',))
-            z_log_name = options.get('zeo-log', z_log_name)
-            z_log = os.path.join(base_dir, z_log_name)
-            z_log_dir = os.path.dirname(z_log)
+            zeo_log_custom = options.get('zeo-log-custom', None)
+            
+            # if zeo-log is given, we use it to set the runner
+            # logfile value in any case
+            z_log_filename = options.get('zeo-log', z_log_name)
+            z_log_filename = os.path.join(base_dir, z_log_filename)
+            z_log_dir = os.path.dirname(z_log_filename)
             if not os.path.exists(z_log_dir):
                 os.makedirs(z_log_dir)
+
+            # zeo-log-custom superseeds zeo-log
+            if zeo_log_custom is None:
+                z_log = z_log_file % {'filename': z_log_filename}
+            else:
+                z_log = zeo_log_custom
 
             file_storage = os.path.sep.join(('var', 'filestorage', 'Data.fs',))
             file_storage = options.get('file-storage', file_storage)
@@ -197,6 +207,7 @@ class Recipe:
                 invalidation_queue_size = invalidation_queue_size,
                 socket_name = socket_name,
                 z_log = z_log,
+                z_log_filename = z_log_filename,
                 storage = storage,
                 zeo_address = zeo_address,
                 pid_file = pid_file,
@@ -294,6 +305,13 @@ blob_storage_template = """
 </blobstorage>
 """.strip()
 
+z_log_file = """\
+     <logfile>
+      path %(filename)s
+      format %%(message)s
+    </logfile>
+""".strip()
+
 # The template used to build zeo.conf
 zeo_conf_template="""\
 %%define INSTANCE %(instance_home)s
@@ -309,10 +327,7 @@ zeo_conf_template="""\
 
 <eventlog>
   level info
-  <logfile>
-    path %(z_log)s
-    format %%(message)s
-  </logfile>
+  %(z_log)s
 </eventlog>
 
 <runner>
@@ -328,7 +343,7 @@ zeo_conf_template="""\
 
   # This logfile should match the one in the zeo.conf file.
   # It is used by zdctl's logtail command, zdrun/zdctl doesn't write it.
-  logfile %(z_log)s
+  logfile %(z_log_filename)s
 </runner>
 
 %(zeo_conf_additional)s

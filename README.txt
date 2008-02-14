@@ -48,6 +48,11 @@ invalidation-queue-size
 zeo-log
   The filename of the ZEO log file. Defaults to var/log/${partname}.log
 
+zeo-log-custom
+  A custom section for the eventlog, to be able to use another
+  event logger than `logfile`. `zeo-log` is still used to set the logfile
+  value in the runner section.
+
 storage-number
   The number used to identify a storage.
 
