@@ -107,7 +107,7 @@ to use `rotatezlogs`::
 Let's run it::
 
     >>> print system(join('bin', 'buildout')),
-    Develop: '/Users/repos/svn.plone.org/plone.recipe.zope2zeoserver'
+    Develop: '...'
     Uninstalling zeo.
     Installing zeo.
     ...
@@ -130,3 +130,4 @@ We should have a zeo.conf with a rotatezlog::
     </eventlog>
     ...
     <BLANKLINE>
+
