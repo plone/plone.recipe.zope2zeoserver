@@ -4,6 +4,9 @@ Change History
 0.11 (unreleased)
 -----------------
 
+- added win32 specific scripts.
+  [tarek]
+
 - added a `zeo-log-custom` option.
   [tarek]
 
