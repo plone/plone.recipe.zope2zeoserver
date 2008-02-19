@@ -38,7 +38,6 @@ class Recipe:
 
     _ws_locations = None
 
-    @property
     def ws_locations(self):
         if self._ws_locations is None:
             self._ws_locations = [d.location for d in self.zodb_ws]
@@ -49,6 +48,7 @@ class Recipe:
                 assert os.path.isdir(software_home), invalid_z2_location_msg
                 self._ws_locations.append(software_home)
         return self._ws_locations
+    ws_locations = property(ws_locations)
 
     def install(self):
         options = self.options
