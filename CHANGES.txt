@@ -1,8 +1,11 @@
 Change History
 ==============
 
-0.11 (unreleased)
------------------
+0.11
+----
+
+- made Python 2.3 compatible
+  [fschulze]
 
 - added win32 specific scripts.
   [tarek]
