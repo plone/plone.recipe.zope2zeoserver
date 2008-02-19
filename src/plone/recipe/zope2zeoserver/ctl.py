@@ -30,12 +30,12 @@ action "help" to find out about available actions.
 import os, sys
 from ZEO import zeoctl
 
-WIN32 = False
-if sys.platform[:3].lower() == "win":
-    WIN32 = True
 
-# TODO: This all probably needs to be adjusted for Windows in the same way
-# that plone.recipe.zope2instance is
+if sys.platform[:3].lower() == "win":
+    print 'For win32 platforms, runzeo.bat or zeoservice.exe should be used'
+    print '%s is based on zdaemon, which is Linux specific' % sys.argv[0]
+    print 'Aborting...'
+    sys.exit(0)
 
 def main(args=None):
     zeoctl.main(args)

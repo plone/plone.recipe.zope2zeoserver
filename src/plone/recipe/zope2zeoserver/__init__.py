@@ -15,6 +15,11 @@
 import sys, os, re, shutil
 import zc.buildout
 import zc.recipe.egg
+import logging
+
+join = os.path.join
+
+curdir = os.path.dirname(__file__)
 
 class Recipe:
 
@@ -72,11 +77,11 @@ class Recipe:
         # this was taken from mkzeoinstance.py
         from ZEO.mkzeoinst import ZEOInstanceBuilder
         
-        zodb3_home = os.path.dirname(os.path.dirname(ZEO.__file__))
+        self.zodb3_home = os.path.dirname(os.path.dirname(ZEO.__file__))
         params = {
             "package": "zeo",
             "PACKAGE": "ZEO",
-            "zodb3_home": zodb3_home,
+            "zodb3_home": self.zodb3_home,
             "instance_home": location,
             "port": 8100, # will be overwritten later
             "python": options['executable'],
@@ -235,9 +240,9 @@ class Recipe:
         options = self.options
         location = options['location']
 
-        zeo_conf = options.get('zeo-conf', None)
-        if zeo_conf is None:
-            zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
+        self.zeo_conf = options.get('zeo-conf', None)
+        if self.zeo_conf is None:
+            self.zeo_conf = os.path.join(location, 'etc', 'zeo.conf')
 
         _, ws = self.egg.working_set(['plone.recipe.zope2zeoserver'])
 
@@ -251,7 +256,7 @@ class Recipe:
             initialization = initialization,
             arguments = ('\n        ["-C", %r]'
                          '\n        + sys.argv[1:]'
-                         % zeo_conf
+                         % self.zeo_conf
                          ),
             )
         # zeopack.py
@@ -275,6 +280,62 @@ class Recipe:
                 initialization='host = "%s"\nport = %s' % tuple(parts),
                 arguments='host, port',
                 )
+
+        
+        if sys.platform == 'win32':
+            self.install_win32_scripts()
+
+    def install_win32_scripts(self):
+            location = self.options['location']
+
+            # zeoservice.py
+            zeo_service = open(join(curdir, 'zeoservice.py')).read()
+            
+            zope2_location = self.options.get('zope2-location', None)
+            if zope2_location is None:
+                zope2_location = join(location, 'parts', 'zope2') 
+            
+            software_home = join(zope2_location, 'lib', 'python')
+            
+            arguments = {'PYTHON': self.options['executable'],
+                         'SOFTWARE_HOME': software_home,
+                         'zodb3_home': self.zodb3_home,
+                         'ZOPE_HOME': zope2_location,
+                         'INSTANCE_HOME': location,
+                         'PACKAGE': 'zeo'}
+            
+            zeo_file = os.path.join(self.options['bin-directory'], 'zeoservice.py')
+            self._write_file(zeo_file, zeo_service % arguments)
+            
+            initialization = """
+            import os; os.environ['PYTHONPATH'] = %r
+            """.strip() % os.path.pathsep.join(self.ws_locations)
+
+            zc.buildout.easy_install.scripts(
+                [('zeoservice', 'zeoservice', 'main')],
+                self.zodb_ws, self.options['executable'], self.options['bin-directory'],
+                extra_paths = self.ws_locations,
+                initialization = initialization,
+                )
+
+
+            # runzeo.bat
+            runzeo = open(join(curdir, 'runzeo.bat')).read()
+            self._write_file(os.path.join(self.options['bin-directory'], 
+                             'runzeo.bat'), runzeo % arguments)
+
+
+    def _write_file(self, path, content):
+        logger = logging.getLogger('zc.buildout.easy_install')
+        f = open(path, 'w')
+        try:
+            f.write(content)
+        finally:
+            f.close()
+        logger.debug('Wrote file %s' % path)
+        os.chmod(path, 0755)
+        logger.warning('Changed mode for %s to 755' % path)
+    
 
 invalid_z2_location_msg = """
 'zope2-location' doesn't point to an actual Zope2 SOFTWARE_HOME. Check this

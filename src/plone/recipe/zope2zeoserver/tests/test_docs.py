@@ -22,6 +22,11 @@ recipe_location = current_dir
 for i in range(5):
     recipe_location = os.path.split(recipe_location)[0]
 
+def _right_platform(doc):
+    if doc.endswith('win32.txt'):
+        return sys.platform == 'win32'
+    return True
+
 def doc_suite(test_dir, globs=None):
     """Returns a test suite, based on doctests found in /doctest."""
     suite = []
@@ -35,7 +40,8 @@ def doc_suite(test_dir, globs=None):
 
     # filtering files on extension
     docs = [os.path.join(doctest_dir, doc) for doc in
-            os.listdir(doctest_dir) if doc.endswith('.txt')]
+            os.listdir(doctest_dir) if doc.endswith('.txt')
+            if _right_platform(doc)]
 
     for test in docs:
         suite.append(doctest.DocFileSuite(test, optionflags=flags, 
