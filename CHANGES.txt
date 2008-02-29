@@ -4,6 +4,9 @@ Change History
 0.12 (unreleased)
 -----------------
 
+- fixed zeopack generation so it includes zope-location.
+  [tarek]
+
 0.11
 ----
 

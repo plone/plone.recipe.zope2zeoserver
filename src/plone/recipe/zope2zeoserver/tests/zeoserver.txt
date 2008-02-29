@@ -130,3 +130,38 @@ We should have a zeo.conf with a rotatezlog::
     ...
     <BLANKLINE>
 
+Zeopack
+=======
+
+Let's make sure the generated zeopack integrates zope2-location lib
+folder in its paths, otherwise it won't work::
+
+    >>> lib_dir = join(sample_buildout, 'parts', 'zope2', 'lib', 'python') 
+    >>> os.makedirs(lib_dir)
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... parts = zeo
+    ... develop = 
+    ...     %(recipe_location)s 
+    ...
+    ... [zeo]
+    ... recipe = plone.recipe.zope2zeoserver
+    ... 
+    ... zope2-location = %(sample_buildout)s/parts/zope2
+    ...
+    ... ''' % globals())
+
+Let's run it::
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '...'
+    Uninstalling zeo.
+    Installing zeo.
+    ...
+
+    >>> zeopack = os.path.join(sample_buildout, 'bin', 'zeopack')
+    >>> lib_dir in open(zeopack).read()
+    True
+

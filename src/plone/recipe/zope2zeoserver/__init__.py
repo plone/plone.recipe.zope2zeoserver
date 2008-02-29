@@ -274,11 +274,14 @@ class Recipe:
             parts = zeo_address.split(':')
             if len(parts) == 1:
                 parts[0:0] = ['127.0.0.1']
+            
+            extra_paths = [location for location in self.ws_locations
+                           if location not in self.zodb_ws.entries]
             zc.buildout.easy_install.scripts(
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
                 self.zodb_ws, options['executable'], options['bin-directory'],
                 initialization='host = "%s"\nport = %s' % tuple(parts),
-                arguments='host, port',
+                arguments='host, port', extra_paths=extra_paths
                 )
 
         
