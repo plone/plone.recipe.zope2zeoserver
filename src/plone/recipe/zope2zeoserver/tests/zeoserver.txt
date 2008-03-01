@@ -17,20 +17,23 @@ plone.recipe.zope2instance::
     ... [buildout]
     ... parts = zeo
     ... develop = 
-    ...     %(recipe_location)s 
+    ...     %(recipe_location)s
+    ... index = http://pypi.python.org/simple
     ...
     ... [zeo]
     ... recipe = plone.recipe.zope2zeoserver
-    ... 
+    ... zope2-location = %(zope_location)s
     ... ''' % globals()
     >>> write('buildout.cfg', simplest) 
 
 Let's run it::
 
     >>> print system(join('bin', 'buildout')),
-    Develop: '...'
+    Develop: '...plone.recipe.zope2zeoserver'
     ...
-
+    Installing zeo.
+    Generated script '...zeo'.
+    Generated script '...zeopack'.
 
 We should have a basic zeo.conf::
 
@@ -87,12 +90,13 @@ to use `rotatezlogs`::
     ... '''
     ... [buildout]
     ... parts = zeo
+    ... index = http://pypi.python.org/simple
     ... develop = 
     ...     %(recipe_location)s 
     ...
     ... [zeo]
     ... recipe = plone.recipe.zope2zeoserver
-    ... 
+    ... zope2-location = %(zope_location)s
     ... zeo-log-custom =
     ...     %%import iw.rotatezlogs
     ...     <rotatelogfile>
@@ -109,8 +113,6 @@ Let's run it::
     Develop: '...'
     Uninstalling zeo.
     Installing zeo.
-    ...
-    Changed mode for ... to 755
 
 We should have a zeo.conf with a rotatezlog::
 
@@ -136,31 +138,7 @@ Zeopack
 Let's make sure the generated zeopack integrates zope2-location lib
 folder in its paths, otherwise it won't work::
 
-    >>> lib_dir = join(sample_buildout, 'parts', 'zope2', 'lib', 'python') 
-    >>> os.makedirs(lib_dir)
-
-    >>> write('buildout.cfg',
-    ... '''
-    ... [buildout]
-    ... parts = zeo
-    ... develop = 
-    ...     %(recipe_location)s 
-    ...
-    ... [zeo]
-    ... recipe = plone.recipe.zope2zeoserver
-    ... 
-    ... zope2-location = %(sample_buildout)s/parts/zope2
-    ...
-    ... ''' % globals())
-
-Let's run it::
-
-    >>> print system(join('bin', 'buildout')),
-    Develop: '...'
-    Uninstalling zeo.
-    Installing zeo.
-    ...
-
+    >>> lib_dir = join(zope_location, 'lib', 'python') 
     >>> zeopack = os.path.join(sample_buildout, 'bin', 'zeopack')
     >>> lib_dir in open(zeopack).read()
     True
