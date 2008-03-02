@@ -29,7 +29,7 @@ plone.recipe.zope2instance::
 Let's run it::
 
     >>> print system(join('bin', 'buildout')),
-    Develop: '...plone.recipe.zope2zeoserver'
+    Develop: '...plone.recipe.zope2zeoserver...'
     ...
     Installing zeo.
     Generated script '...zeo'.
