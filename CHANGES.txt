@@ -1,37 +1,36 @@
 Change History
 ==============
 
-0.12 (unreleased)
+0.12 (2008-03-02)
 -----------------
 
-- fixed zeopack generation so it includes zope-location.
+- Fixed zeopack generation so it includes zope-location.
   [tarek]
 
-0.11
-----
+0.11 (2008-02-19)
+-----------------
 
-- made Python 2.3 compatible
+- Made Python 2.3 compatible
   [fschulze]
 
-- added win32 specific scripts.
+- Added win32 specific scripts.
   [tarek]
 
-- added a `zeo-log-custom` option.
+- Added a `zeo-log-custom` option.
   [tarek]
 
-- added a test environement and a basic doctest to validate
-  the recipe.
+- Added a test environement and a basic doctest to validate the recipe.
   [tarek]
 
-0.10
-----
+0.10 (2008-01-09)
+-----------------
 
 - Calculate the package working set outside of the recipe constructor. Closes
   https://bugs.launchpad.net/collective.buildout/+bug/180084
   [rochael]
 
-0.9
----
+0.9 (2007-12-30)
+----------------
 
 - Added `invalidation-queue-size` and `storage-number` options.
   [hannosch]
