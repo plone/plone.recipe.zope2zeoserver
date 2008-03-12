@@ -34,6 +34,7 @@ Let's run it::
     Installing zeo.
     Generated script '...zeo'.
     Generated script '...zeopack'.
+    ...
 
 We should have a basic zeo.conf::
 
@@ -113,6 +114,7 @@ Let's run it::
     Develop: '...'
     Uninstalling zeo.
     Installing zeo.
+    ...
 
 We should have a zeo.conf with a rotatezlog::
 
@@ -140,6 +142,8 @@ folder in its paths, otherwise it won't work::
 
     >>> lib_dir = join(zope_location, 'lib', 'python') 
     >>> zeopack = os.path.join(sample_buildout, 'bin', 'zeopack')
-    >>> lib_dir in open(zeopack).read()
+    >>> if os.name == 'nt':
+    ...     zeopack += '-script.py'
+    >>> repr(lib_dir) in open(zeopack).read()
     True
 

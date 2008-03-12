@@ -4,6 +4,8 @@ Change History
 0.13 (unreleased)
 -----------------
 
+- Fixed test breakages on Windows.
+  [rochael]
 
 0.12 (2008-03-02)
 -----------------
