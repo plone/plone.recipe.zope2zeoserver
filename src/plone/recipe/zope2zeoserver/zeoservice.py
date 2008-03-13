@@ -120,9 +120,22 @@ class InstanceService(Service):
     process_runner = PYTHON
     process_args = '"%%s" -C "%%s"' %% (ZEO_RUN, CONFIG_FILE)
 
-def main():
+def main(cls=InstanceService):
+    serviceClassString = None
+
+    if __name__ != '__main__':
+        # HandleCommandLine can only resolve the full path to the
+        # module to be imported if we are being executed directly. So
+        # account for that and resolve the serviceClassString
+        # ourselves otherwise, by using code similar to the one used
+        # in win32serviceutil.GetServiceClassString
+        import win32api
+        fname = win32api.GetFullPathName(__file__)
+        modName = os.path.splitext(fname)[0]
+        serviceClassString = modName + "." + cls.__name__
+
     import win32serviceutil
-    win32serviceutil.HandleCommandLine(InstanceService)
+    win32serviceutil.HandleCommandLine(cls, serviceClassString)
 
 if __name__ == '__main__':
     main()

@@ -4,6 +4,13 @@ Change History
 0.13 (unreleased)
 -----------------
 
+- Fixed call to HandleCommandLine by computing the serviceClassString
+  ourselves if our module name is not __main__ (ie, if it was imported
+  from another module). This works around the fact that
+  HandleCommandLine calls GetServiceClassString which in turn only
+  calculates the full path if the original module is __main__.
+  [sidnei]
+
 - Fixed generation of runzeo.bat when using ZEO from egg, where ZConfig is not
   in ZODB3_HOME.
   [rochael]
