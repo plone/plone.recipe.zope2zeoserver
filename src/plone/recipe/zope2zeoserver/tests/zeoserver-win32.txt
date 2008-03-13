@@ -21,6 +21,7 @@ plone.recipe.zope2instance::
     ...
     ... [zeo]
     ... recipe = plone.recipe.zope2zeoserver
+    ... zope2-location = %(recipe_location)s/src/plone/recipe/zope2zeoserver/tests/zope2
     ... 
     ... ''' % globals()
     >>> write('buildout.cfg', simplest) 
@@ -93,7 +94,6 @@ First of all, the batch script::
     >>> print open(join(sample_buildout, 'bin', 'runzeo.bat')).read()
     @rem zeo instance start script
     ...
-    @set PYTHONPATH=%ZODB3_HOME%
     @set RUNZEO=%ZODB3_HOME%/ZEO/runzeo.py
     "%PYTHON%" "%RUNZEO%" -C "%CONFIG_FILE%" %1 %2 %3 %4 %5 %6 %7 %8 %9
 

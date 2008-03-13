@@ -87,7 +87,7 @@ ZOPE_HOME = r'%(ZOPE_HOME)s'
 ZODB3_HOME = r'%(zodb3_home)s'
 
 ZEO_RUN = r'%%s\\ZEO\\runzeo.py' %% ZODB3_HOME
-CONFIG_FILE= os.path.join(INSTANCE_HOME, 'etc', 'zope.conf')
+CONFIG_FILE= os.path.join(INSTANCE_HOME, 'etc', 'zeo.conf')
 PYTHONSERVICE_EXE=r'%%s\\bin\\PythonService.exe' %% ZOPE_HOME
 
 # Setup the environment, so sub-processes see these variables

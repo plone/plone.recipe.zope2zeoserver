@@ -42,10 +42,12 @@ class Recipe:
         if self._ws_locations is None:
             self._ws_locations = [d.location for d in self.zodb_ws]
             # account for zope2-location, if provided
-            if self.options.get('zope2-location') is not None:
-                software_home = os.path.join(self.options['zope2-location'],
+            zope2_location = self.options.get('zope2-location')
+            if zope2_location is not None:
+                software_home = os.path.join(zope2_location,
                                              'lib', 'python')
-                assert os.path.isdir(software_home), invalid_z2_location_msg
+                assert os.path.isdir(software_home), (invalid_z2_location_msg %
+                                                      zope2_location)
                 self._ws_locations.append(software_home)
         return self._ws_locations
     ws_locations = property(ws_locations)
@@ -291,35 +293,41 @@ class Recipe:
     def install_win32_scripts(self):
             location = self.options['location']
 
-            # zeoservice.py
-            zeo_service = open(join(curdir, 'zeoservice.py')).read()
-            
             zope2_location = self.options.get('zope2-location', None)
-            if zope2_location is None:
-                zope2_location = join(location, 'parts', 'zope2') 
-            
-            software_home = join(zope2_location, 'lib', 'python')
+
+            if zope2_location is not None:
+                software_home = join(zope2_location, 'lib', 'python')
+            else:
+                software_home = None
             
             arguments = {'PYTHON': self.options['executable'],
                          'SOFTWARE_HOME': software_home,
                          'zodb3_home': self.zodb3_home,
                          'ZOPE_HOME': zope2_location,
                          'INSTANCE_HOME': location,
+                         'PYTHONPATH': os.path.pathsep.join(self.ws_locations),
                          'PACKAGE': 'zeo'}
             
-            zeo_file = os.path.join(self.options['bin-directory'], 'zeoservice.py')
-            self._write_file(zeo_file, zeo_service % arguments)
-            
-            initialization = """
-            import os; os.environ['PYTHONPATH'] = %r
-            """.strip() % os.path.pathsep.join(self.ws_locations)
+            if zope2_location is not None:
+                # zeoservice.py
+                # requires zope2_location due to the nt_svcutils package
+                zeo_service = open(join(curdir, 'zeoservice.py')).read()
+                zeo_file = os.path.join(self.options['bin-directory'],
+                                        'zeoservice.py')
+                self._write_file(zeo_file, zeo_service % arguments)
+                
+                initialization = """
+                import os; os.environ['PYTHONPATH'] = %r
+                """.strip() % os.path.pathsep.join(self.ws_locations)
 
-            zc.buildout.easy_install.scripts(
-                [('zeoservice', 'zeoservice', 'main')],
-                self.zodb_ws, self.options['executable'], self.options['bin-directory'],
-                extra_paths = self.ws_locations,
-                initialization = initialization,
-                )
+                zc.buildout.easy_install.scripts(
+                    [('zeoservice', 'zeoservice', 'main')],
+                    self.zodb_ws,
+                    self.options['executable'],
+                    self.options['bin-directory'],
+                    extra_paths = self.ws_locations,
+                    initialization = initialization,
+                    )
 
 
             # runzeo.bat
@@ -341,7 +349,7 @@ class Recipe:
     
 
 invalid_z2_location_msg = """
-'zope2-location' doesn't point to an actual Zope2 SOFTWARE_HOME. Check this
+'zope2-location' (%r) doesn't point to an actual Zope2 SOFTWARE_HOME. Check this
 setting and, eventually, make sure this buildout part is being run after the
 part that is supposed to provide the 'zope2-location' value.
 """.strip()

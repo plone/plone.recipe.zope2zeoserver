@@ -4,6 +4,14 @@ Change History
 0.13 (unreleased)
 -----------------
 
+- Fixed generation of runzeo.bat when using ZEO from egg, where ZConfig is not
+  in ZODB3_HOME.
+  [rochael]
+
+- Only generate the Windows service scripts if there is a zope2-location, since
+  it's currently the only place where the nt_svcutils can be found.
+  [rochael]
+
 - Fixed test breakages on Windows.
   [rochael]
 
