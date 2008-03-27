@@ -33,8 +33,7 @@ Let's run it::
     ...
     Installing zeo.
     Generated script '...zeo'.
-    Generated script '...zeopack'.
-    ...
+    Generated script '...zeopack'...
 
 We should have a basic zeo.conf::
 
@@ -113,8 +112,7 @@ Let's run it::
     >>> print system(join('bin', 'buildout')),
     Develop: '...'
     Uninstalling zeo.
-    Installing zeo.
-    ...
+    Installing zeo...
 
 We should have a zeo.conf with a rotatezlog::
 
