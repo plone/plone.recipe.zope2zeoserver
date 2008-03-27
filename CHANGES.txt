@@ -1,7 +1,7 @@
 Change History
 ==============
 
-0.13 (unreleased)
+0.13 (2008-03-27)
 -----------------
 
 - Fixed call to HandleCommandLine by computing the serviceClassString
