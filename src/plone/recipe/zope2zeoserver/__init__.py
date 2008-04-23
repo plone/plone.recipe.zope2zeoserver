@@ -191,6 +191,13 @@ class Recipe:
             if not os.path.exists(file_storage_dir):
                 os.makedirs(file_storage_dir)
 
+            if options.get('authentication-database', ''):
+                authentication = authentication_template % \
+                        dict(database=options.get('authentication-database'),
+                             realm=options.get('authentication-realm', 'ZEO'))
+            else:
+                authentication = ''
+
             pid_file = options.get(
                 'pid-file',
                 os.path.join(base_dir, 'var', self.name + '.pid'))
@@ -215,6 +222,7 @@ class Recipe:
                 socket_name = socket_name,
                 z_log = z_log,
                 z_log_filename = z_log_filename,
+                authentication = authentication,
                 storage = storage,
                 zeo_address = zeo_address,
                 pid_file = pid_file,
@@ -384,8 +392,14 @@ z_log_file = """\
     </logfile>
 """.strip()
 
+authentication_template = """
+  authentication-protocol digest
+  authentication-database %(database)s
+  authentication-realm %(realm)s
+"""
+
 # The template used to build zeo.conf
-zeo_conf_template="""\
+zeo_conf_template = """\
 %%define INSTANCE %(instance_home)s
 
 <zeo>
@@ -393,6 +407,7 @@ zeo_conf_template="""\
   read-only false
   invalidation-queue-size %(invalidation_queue_size)s
   pid-filename %(pid_file)s
+  %(authentication)s
 </zeo>
 
 %(storage)s

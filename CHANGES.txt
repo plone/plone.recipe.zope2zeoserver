@@ -4,6 +4,9 @@ Change History
 0.14 (unreleased)
 -----------------
 
+- Add support for ZEO authentication.
+  [wichert]
+
 
 0.13 (2008-03-27)
 -----------------

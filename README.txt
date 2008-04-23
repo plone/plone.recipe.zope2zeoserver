@@ -67,6 +67,13 @@ socket-name
   The filename where ZEO will write its socket file.
   Defaults to var/zeo.zdsock.
 
+authentication-database
+  The filename for a authentication database. Only accounts listed in this
+  database will be allowed to access the ZEO server.
+
+authentication-realm
+  The authentication realm. Defaults to 'ZEO'
+
 zeo-conf-additional
   Give additional lines to zeo.conf. Make sure you indent any lines after
   the one with the parameter.           
