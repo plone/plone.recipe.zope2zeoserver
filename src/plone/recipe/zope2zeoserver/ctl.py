@@ -27,7 +27,7 @@ configuration option default_to_interactive is set to false). Use the
 action "help" to find out about available actions.
 """
 
-import os, sys
+import sys
 from ZEO import zeoctl
 
 

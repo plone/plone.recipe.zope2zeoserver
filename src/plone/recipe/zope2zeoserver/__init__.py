@@ -12,7 +12,7 @@
 #
 ##############################################################################
 
-import sys, os, re, shutil
+import sys, os, shutil
 import zc.buildout
 import zc.recipe.egg
 import logging
