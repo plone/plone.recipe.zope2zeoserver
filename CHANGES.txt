@@ -7,6 +7,12 @@ Change History
 - Add support for ZEO authentication.
   [wichert]
 
+- Fix the test to not rely on a specific installation folder name.
+  [dataflake]
+
+- Added support for a unix socket path in `zeo-address` and expanded the
+  test coverage for the `zeopack` script generation.
+  [dataflake]
 
 0.13 (2008-03-27)
 -----------------

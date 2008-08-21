@@ -280,18 +280,33 @@ class Recipe:
                     extra_paths = self.ws_locations + [directory],
                     )
         else:
+            host = port = socket_path = ''
             zeo_address = options.get('zeo-address', '8100')
             parts = zeo_address.split(':')
+
             if len(parts) == 1:
-                parts[0:0] = ['127.0.0.1']
+                try:
+                    # if the only argument is a port, which must be an int,
+                    # we use 127.0.0.1 as the host by default
+                    int_port = int(zeo_address)
+                    host = '127.0.0.1'
+                    port = zeo_address
+                except ValueError:
+                    # The address is a simple string, we now assume it is
+                    # a path to a Unix socket file 
+                    socket_path = zeo_address
+            else:
+                host, port = parts
             
+            address_info = 'host = "%s"\nport = "%s"\nsocket_path = "%s"' % (
+                                host, port, socket_path)
             extra_paths = [location for location in self.ws_locations
                            if location not in self.zodb_ws.entries]
             zc.buildout.easy_install.scripts(
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
                 self.zodb_ws, options['executable'], options['bin-directory'],
-                initialization='host = "%s"\nport = %s' % tuple(parts),
-                arguments='host, port', extra_paths=extra_paths
+                initialization=address_info,
+                arguments='host, port, socket_path', extra_paths=extra_paths
                 )
 
         
