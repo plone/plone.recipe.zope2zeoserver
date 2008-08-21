@@ -1,11 +1,8 @@
 Change History
 ==============
 
-0.14 (unreleased)
+0.14 (2008-08-21)
 -----------------
-
-- Add support for ZEO authentication.
-  [wichert]
 
 - Fix the test to not rely on a specific installation folder name.
   [dataflake]
@@ -13,6 +10,10 @@ Change History
 - Added support for a unix socket path in `zeo-address` and expanded the
   test coverage for the `zeopack` script generation.
   [dataflake]
+
+- Add support for ZEO authentication.
+  [wichert]
+
 
 0.13 (2008-03-27)
 -----------------
@@ -35,11 +36,13 @@ Change History
 - Fixed test breakages on Windows.
   [rochael]
 
+
 0.12 (2008-03-02)
 -----------------
 
 - Fixed zeopack generation so it includes zope-location.
   [tarek]
+
 
 0.11 (2008-02-19)
 -----------------
@@ -56,12 +59,14 @@ Change History
 - Added a test environement and a basic doctest to validate the recipe.
   [tarek]
 
+
 0.10 (2008-01-09)
 -----------------
 
 - Calculate the package working set outside of the recipe constructor. Closes
   https://bugs.launchpad.net/collective.buildout/+bug/180084
   [rochael]
+
 
 0.9 (2007-12-30)
 ----------------
@@ -78,6 +83,7 @@ Change History
 - Renamed `zope-conf-additional` option to `zeo-conf-additional`.
   [rochael]
 
+
 0.8
 ---
 
@@ -89,6 +95,7 @@ Change History
   the part.
   [nouri, mbenali]
 
+
 0.7
 ---
 
@@ -97,6 +104,7 @@ Change History
 
 - Add option to set socket-name.
   [smcmahon]
+
 
 0.6
 ---
@@ -107,17 +115,20 @@ Change History
 - Add a wrapper around zeopack which inserts default options for our ZEO server.
   [wichert]
 
+
 0.5
 ---
 
 - Added an option to set the effective-user.
   [optilude]
 
+
 0.3
 ---
 
 - Updated setup.py.
   [optilude]
+
 
 0.2
 ---
@@ -133,6 +144,7 @@ Change History
   surprise me if this needs adjustment for Windows in the same way that we do
   in plone.recipe.zope2instance. :-(
   [optilude]
+
 
 0.1
 ---

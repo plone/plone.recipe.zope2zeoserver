@@ -17,7 +17,7 @@ setup(
     name = name,
     version = version,
     author = "Hanno Schlichting",
-    author_email = "plone@hannosch.info",
+    author_email = "hannosch@plone.org",
     description = "ZC Buildout recipe for installing a Zope 2 ZEO server",
     long_description = long_description,
     license = "ZPL 2.1",
