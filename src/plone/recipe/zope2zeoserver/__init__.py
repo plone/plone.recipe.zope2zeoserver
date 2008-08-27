@@ -334,7 +334,7 @@ class Recipe:
             if zope2_location is not None:
                 # zeoservice.py
                 # requires zope2_location due to the nt_svcutils package
-                zeo_service = open(join(curdir, 'zeoservice.py')).read()
+                zeo_service = open(join(curdir, 'zeoservice.py.in')).read()
                 zeo_file = os.path.join(self.options['bin-directory'],
                                         'zeoservice.py')
                 self._write_file(zeo_file, zeo_service % arguments)
