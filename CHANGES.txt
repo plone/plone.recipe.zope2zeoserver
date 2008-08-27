@@ -1,12 +1,13 @@
 Change History
 ==============
 
-0.15
-----
+0.15 (2008-08-27)
+-----------------
 
 - Renamed zeoservice.py to zeoservice.py.in to avoid errors during egg
   creation, as it tries to compile the template file.
   [hannosch]
+
 
 0.14 (2008-08-21)
 -----------------
