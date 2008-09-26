@@ -28,7 +28,10 @@ action "help" to find out about available actions.
 """
 
 import sys
+import os
+
 from ZEO import zeoctl
+from ZEO import runzeo
 
 
 if sys.platform[:3].lower() == "win":
@@ -38,4 +41,9 @@ if sys.platform[:3].lower() == "win":
     sys.exit(0)
 
 def main(args=None):
-    zeoctl.main(args)
+    # When we detect Supervisord we need to make sure we do not fork a
+    # sub process since Supervisord does not like that
+    if 'SUPERVISOR_ENABLED' in os.environ:
+        runzeo.main(args)
+    else:
+        zeoctl.main(args)
