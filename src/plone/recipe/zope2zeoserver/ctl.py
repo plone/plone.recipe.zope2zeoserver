@@ -44,6 +44,8 @@ def main(args=None):
     # When we detect Supervisord we need to make sure we do not fork a
     # sub process since Supervisord does not like that
     if 'SUPERVISOR_ENABLED' in os.environ:
+        # We will ignore any command sent and always start in foreground mode
+        args = args[:2]
         runzeo.main(args)
     else:
         zeoctl.main(args)

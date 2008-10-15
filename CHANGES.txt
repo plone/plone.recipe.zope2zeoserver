@@ -4,6 +4,14 @@ Change History
 0.16
 ----
 
+- Adjusted the Supervisord support to ignore the command sent to the script.
+  This avoids a `positional arguments are not supported` error.
+  [hannosch]
+
+- The launch script now detects if it is being executed from Supervisord.
+  This makes it more manageable for Supervisord since it no longer forks.
+  [jvloothuis]
+
 
 0.15 (2008-08-27)
 -----------------
