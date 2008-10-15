@@ -1,8 +1,8 @@
 Change History
 ==============
 
-0.16
-----
+0.16 (2008-10-15)
+-----------------
 
 - Adjusted the Supervisord support to ignore the command sent to the script.
   This avoids a `positional arguments are not supported` error.
