@@ -1,9 +1,14 @@
 Change History
 ==============
 
-0.18 (unreleased)
------------------
+1.0 (unreleased)
+----------------
 
+* Bump version number to 1.0 since this has been stable for a long time.
+  [wichert]
+
+* Add MANIFEST.in file so we can create a release from an export.
+  [wichert]
 
 0.17 (2008-11-04)
 -----------------
