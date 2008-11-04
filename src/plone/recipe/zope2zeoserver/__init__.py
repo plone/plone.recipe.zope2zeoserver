@@ -179,8 +179,9 @@ class Recipe:
                 os.makedirs(z_log_dir)
 
             # zeo-log-custom superseeds zeo-log
+            logformat=options.get('zeo-log-format', '%(asctime)s %(message)s')
             if zeo_log_custom is None:
-                z_log = z_log_file % {'filename': z_log_filename}
+                z_log = z_log_file % {'filename': z_log_filename, 'logformat' : logformat}
             else:
                 z_log = zeo_log_custom
 
@@ -403,7 +404,7 @@ blob_storage_template = """
 z_log_file = """\
      <logfile>
       path %(filename)s
-      format %%(message)s
+      format %(logformat)s
     </logfile>
 """.strip()
 

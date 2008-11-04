@@ -4,6 +4,9 @@ Change History
 0.17 (unreleased)
 -----------------
 
+- Make the log format configurable and change the default to include the
+  current time.
+  [wichert]
 
 0.16 (2008-10-15)
 -----------------
