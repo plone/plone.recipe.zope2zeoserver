@@ -85,6 +85,7 @@ SOFTWARE_HOME=r'%(SOFTWARE_HOME)s'
 INSTANCE_HOME = r'%(INSTANCE_HOME)s'
 ZOPE_HOME = r'%(ZOPE_HOME)s'
 ZODB3_HOME = r'%(zodb3_home)s'
+PYTHONPATH = r'%(PYTHONPATH)s'
 
 ZEO_RUN = r'%%s\\ZEO\\runzeo.py' %% ZODB3_HOME
 CONFIG_FILE= os.path.join(INSTANCE_HOME, 'etc', 'zeo.conf')
@@ -92,9 +93,14 @@ PYTHONSERVICE_EXE=r'%%s\\bin\\PythonService.exe' %% ZOPE_HOME
 
 # Setup the environment, so sub-processes see these variables
 parts = os.environ.get("PYTHONPATH", "").split(os.pathsep)
+for part in PYTHONPATH.split(os.pathsep):
+    if part not in parts:
+        parts.append(part)
+
 if SOFTWARE_HOME not in parts:
     parts = filter(None, [SOFTWARE_HOME] + parts)
-    os.environ["PYTHONPATH"] = os.pathsep.join(parts)
+
+os.environ["PYTHONPATH"] = os.pathsep.join(parts)
 os.environ["INSTANCE_HOME"] = INSTANCE_HOME
 
 # Ensure SOFTWARE_HOME is on our current sys.path so we can import the
