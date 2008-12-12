@@ -81,6 +81,10 @@ zeo-conf-additional
   Give additional lines to zeo.conf. Make sure you indent any lines after
   the one with the parameter.           
 
+monitor-address
+  The address at which the monitor server should listen.
+  The monitor server provides server statistics in a simple text format.
+
 Reporting bugs or asking questions
 ----------------------------------
 

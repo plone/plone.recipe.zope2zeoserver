@@ -4,6 +4,8 @@ Change History
 1.2 (unreleased)
 ----------------
 
+* Added support for the zeo.conf 'monitor-address' parameter.
+  [mattss]
 
 1.1 (2008-12-05)
 ----------------

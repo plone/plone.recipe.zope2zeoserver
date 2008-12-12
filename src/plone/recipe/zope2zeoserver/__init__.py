@@ -153,6 +153,10 @@ class Recipe:
             zeo_conf_additional = options.get('zeo-conf-additional', '')
             storage_number = options.get('storage-number', '1')
 
+            monitor_address = options.get('monitor-address', '')
+            if monitor_address:
+                monitor_address = 'monitor-address %s' % monitor_address
+
             effective_user = options.get('effective-user', '')
             if effective_user:
                effective_user = 'user %s' % effective_user
@@ -228,6 +232,7 @@ class Recipe:
                 zeo_address = zeo_address,
                 pid_file = pid_file,
                 zeo_conf_additional = zeo_conf_additional,
+                monitor_address = monitor_address,
                 )
 
         zeo_conf_path = os.path.join(location, 'etc', 'zeo.conf')
@@ -424,6 +429,7 @@ zeo_conf_template = """\
   invalidation-queue-size %(invalidation_queue_size)s
   pid-filename %(pid_file)s
   %(authentication)s
+  %(monitor_address)s
 </zeo>
 
 %(storage)s
