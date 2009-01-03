@@ -4,6 +4,11 @@ Change History
 1.2 (unreleased)
 ----------------
 
+* Generate a bin/repozo script to perform backups using repozo.py (and
+  set up the appropriate pythonpath for this to work).
+  Copied from plone.recipe.zope2instance.
+  [fschulze]
+
 * Added support for the zeo.conf 'monitor-address' parameter.
   [mattss]
 

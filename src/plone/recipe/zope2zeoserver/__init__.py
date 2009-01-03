@@ -315,7 +315,20 @@ class Recipe:
                 arguments='host, port, socket_path', extra_paths=extra_paths
                 )
 
-        
+        # The backup script, pointing to repozo.py
+        repozo = options.get('repozo', None)
+        if repozo is None:
+            repozo = os.path.join(options['zope2-location'], 'utilities', 'ZODBTools', 'repozo.py')
+
+        directory, filename = os.path.split(repozo)
+        if repozo and os.path.exists(repozo):
+            zc.buildout.easy_install.scripts(
+                [('repozo', os.path.splitext(filename)[0], 'main')],
+                {}, options['executable'], options['bin-directory'],
+                extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
+                               directory],
+                )
+
         if sys.platform == 'win32':
             self.install_win32_scripts()
 
