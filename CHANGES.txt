@@ -1,7 +1,7 @@
 Change History
 ==============
 
-1.2 (unreleased)
+1.2 (2009-02-25)
 ----------------
 
 * Generate a bin/repozo script to perform backups using repozo.py (and
