@@ -80,6 +80,17 @@ authentication-database
   The filename for a authentication database. Only accounts listed in this
   database will be allowed to access the ZEO server.
 
+  The format of the database file is::
+
+    realm <realm>
+    <username>:<hash>
+
+  Where the hash is generated via::
+
+    import sha
+    string = "%s:%s:%s" % (username, realm, password)
+    sha.new(string).hexdigest()
+
 authentication-realm
   The authentication realm. Defaults to 'ZEO'
 
