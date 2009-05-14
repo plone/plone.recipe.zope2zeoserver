@@ -83,6 +83,18 @@ authentication-database
 authentication-realm
   The authentication realm. Defaults to 'ZEO'
 
+pack-days
+  Specify of days for the zeopack script to retain of history. Defaults to
+  one day.
+
+pack-user
+  If the ZEO server uses authentication, this is the username used by the
+  zeopack script to connect to the ZEO server.
+
+pack-password
+  If the ZEO server uses authentication, this is the password used by the
+  zeopack script to connect to the ZEO server.
+
 zeo-conf-additional
   Give additional lines to zeo.conf. Make sure you indent any lines after
   the one with the parameter.           

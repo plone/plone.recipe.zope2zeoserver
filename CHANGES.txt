@@ -4,6 +4,12 @@ Change History
 1.3 (unreleased)
 ----------------
 
+* Added the new `pack-days`, `pack-user` and `pack-password` options to give
+  more flexible options for the zeopack script and support packing databases
+  which require authentication. Also reworked the zeopack internals to support
+  packing blob storages. The default for packing is now to retain one day of
+  database history.
+  [hannosch]
 
 1.2 (2009-02-25)
 ----------------

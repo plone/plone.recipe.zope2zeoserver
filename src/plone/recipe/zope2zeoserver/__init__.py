@@ -303,16 +303,47 @@ class Recipe:
                     socket_path = zeo_address
             else:
                 host, port = parts
-            
-            address_info = 'host = "%s"\nport = "%s"\nsocket_path = "%s"' % (
-                                host, port, socket_path)
+
+            username = options.get('pack-user', None)
+            password = options.get('pack-password', None)
+            if username is not None:
+                realm = options.get('authentication-realm', 'ZEO')
+            else:
+                realm = None
+
+            arg_list = [
+                'host', 'port', 'unix', 'days',
+                'username', 'password', 'realm', 'blob_dir', 'storage',
+            ]
+            arguments = dict(
+                host=host,
+                port=port,
+                unix=socket_path,
+                days=options.get('pack-days', 1),
+                username=username,
+                password=password,
+                realm=realm,
+                blob_dir=options.get('blob-storage', None),
+                storage=1,
+            )
+            arguments_info = ''
+            for k,v in arguments.items():
+                if not v:
+                    arguments_info += '%s = None\n' % k
+                else:
+                    arguments_info += '%s = "%s"\n' % (k, v)
+
             extra_paths = [location for location in self.ws_locations
                            if location not in self.zodb_ws.entries]
+            # Make sure the recipe itself and its dependencies are on the path
+            extra_paths.append(ws.by_key[options['recipe']].location)
+            extra_paths.append(ws.by_key['zc.buildout'].location)
+            extra_paths.append(ws.by_key['zc.recipe.egg'].location)
             zc.buildout.easy_install.scripts(
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
                 self.zodb_ws, options['executable'], options['bin-directory'],
-                initialization=address_info,
-                arguments='host, port, socket_path', extra_paths=extra_paths
+                initialization=arguments_info,
+                arguments=', '.join(arg_list), extra_paths=extra_paths
                 )
 
         # The backup script, pointing to repozo.py
