@@ -1,7 +1,7 @@
 Change History
 ==============
 
-1.3 (unreleased)
+1.3 (2009-05-14)
 ----------------
 
 * Added the new `pack-days`, `pack-user` and `pack-password` options to give

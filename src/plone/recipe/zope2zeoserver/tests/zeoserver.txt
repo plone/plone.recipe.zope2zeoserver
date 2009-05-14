@@ -176,7 +176,7 @@ being the localhost address 127.0.0.1:
     Uninstalling zeo.
     Installing zeo...
 
-Now check the values for `host`, `port` and `socket_path`::
+Now check the values for `host`, `port` and `unix`::
 
     >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'zeopack')
     >>> zeopack = open(zeopack_path, 'r').read()
@@ -184,7 +184,7 @@ Now check the values for `host`, `port` and `socket_path`::
     True
     >>> 'port = "8001"' in zeopack
     True
-    >>> 'socket_path = ""' in zeopack
+    >>> 'unix = None' in zeopack
     True
 
 When a host:port combination is provided, the recipe must split it correctly::
@@ -208,7 +208,7 @@ When a host:port combination is provided, the recipe must split it correctly::
     Uninstalling zeo.
     Installing zeo...
 
-Now check the values for `host`, `port` and `socket_path`::
+Now check the values for `host`, `port` and `unix`::
 
     >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'zeopack')
     >>> zeopack = open(zeopack_path, 'r').read()
@@ -216,7 +216,7 @@ Now check the values for `host`, `port` and `socket_path`::
     True
     >>> 'port = "8001"' in zeopack
     True
-    >>> 'socket_path = ""' in zeopack
+    >>> 'unix = None' in zeopack
     True
 
 If the `zeo-address`-parameter is a string it is assumed to be the path
@@ -241,14 +241,14 @@ to a Unix socket file::
     Uninstalling zeo.
     Installing zeo...
 
-Now check the values for `host`, `port` and `socket_path`::
+Now check the values for `host`, `port` and `unix`::
 
     >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'zeopack')
     >>> zeopack = open(zeopack_path, 'r').read()
-    >>> 'host = ""' in zeopack
+    >>> 'host = None' in zeopack
     True
-    >>> 'port = ""' in zeopack
+    >>> 'port = None' in zeopack
     True
-    >>> 'socket_path = "/path/to/zeo.socket"' in zeopack
+    >>> 'unix = "/path/to/zeo.socket"' in zeopack
     True
 
