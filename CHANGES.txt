@@ -7,6 +7,9 @@ Change History
 * Documented the format of the authentication database file.
   [hannosch]
 
+* Added support for more than one zeoinstance per buildout on win32 enviroments
+  [erico_andrei]
+
 1.3 (2009-05-14)
 ----------------
 
