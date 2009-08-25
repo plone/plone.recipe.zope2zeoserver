@@ -26,7 +26,7 @@ zeopack
   The path to the zeopack.py backup script. A wrapper for this will be
   generated in bin/zeopack, which sets up the appropriate environment to
   run this. Defaults to "${zope2-location}/utilities/ZODBTools/zeopack.py".
-  Set this option to an empty value if you do not want this script to be 
+  Set this option to an empty value if you do not want this script to be
   generated.
 
 repozo
@@ -66,7 +66,7 @@ storage-number
   The number used to identify a storage.
 
 file-storage
-  The filename where the ZODB data file will be stored. 
+  The filename where the ZODB data file will be stored.
   Defaults to var/filestorage/Data.fs.
 
 blob-storage
@@ -108,11 +108,15 @@ pack-password
 
 zeo-conf-additional
   Give additional lines to zeo.conf. Make sure you indent any lines after
-  the one with the parameter.           
+  the one with the parameter.
 
 monitor-address
   The address at which the monitor server should listen.
   The monitor server provides server statistics in a simple text format.
+
+relative-paths
+  Set this to `true` to make the generated scripts use relative
+  paths. You can also enable this in the `[buildout]` section.
 
 Reporting bugs or asking questions
 ----------------------------------

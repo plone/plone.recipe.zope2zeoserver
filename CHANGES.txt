@@ -10,6 +10,9 @@ Change History
 * Added support for more than one zeoinstance per buildout on win32 enviroments
   [erico_andrei]
 
+* Added support for relative-paths in the script generation.
+  [jvloothuis]
+
 1.3 (2009-05-14)
 ----------------
 

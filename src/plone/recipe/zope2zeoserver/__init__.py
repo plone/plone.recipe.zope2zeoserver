@@ -36,6 +36,18 @@ class Recipe:
 
         _, self.zodb_ws = self.egg.working_set()
 
+        # Relative path support for the generated scripts
+        relative_paths = options.get(
+            'relative-paths',
+            buildout['buildout'].get('relative-paths', 'false')
+            )
+        if relative_paths == 'true':
+            options['buildout-directory'] = buildout['buildout']['directory']
+            self._relative_paths = options['buildout-directory']
+        else:
+            self._relative_paths = ''
+            assert relative_paths == 'false'
+
     _ws_locations = None
 
     def ws_locations(self):
@@ -75,10 +87,10 @@ class Recipe:
         # patch the result. A better approach might be to provide independent
         # instance-creation logic, but this raises lots of issues that
         # need to be stored out first.
-        
+
         # this was taken from mkzeoinstance.py
         from ZEO.mkzeoinst import ZEOInstanceBuilder
-        
+
         self.zodb3_home = os.path.dirname(os.path.dirname(ZEO.__file__))
         params = {
             "package": "zeo",
@@ -173,7 +185,7 @@ class Recipe:
 
             z_log_name = os.path.sep.join(('var', 'log', self.name + '.log',))
             zeo_log_custom = options.get('zeo-log-custom', None)
-            
+
             # if zeo-log is given, we use it to set the runner
             # logfile value in any case
             z_log_filename = options.get('zeo-log', z_log_name)
@@ -274,6 +286,7 @@ class Recipe:
                          '\n        + sys.argv[1:]'
                          % self.zeo_conf
                          ),
+            relative_paths=self._relative_paths,
             )
         # zeopack.py
         zeopack = options.get('zeopack', None)
@@ -284,6 +297,7 @@ class Recipe:
                     [('zeopack', os.path.splitext(filename)[0], 'main')],
                     {}, options['executable'], options['bin-directory'],
                     extra_paths = self.ws_locations + [directory],
+                    relative_paths=self._relative_paths,
                     )
         else:
             host = port = socket_path = ''
@@ -299,7 +313,7 @@ class Recipe:
                     port = zeo_address
                 except ValueError:
                     # The address is a simple string, we now assume it is
-                    # a path to a Unix socket file 
+                    # a path to a Unix socket file
                     socket_path = zeo_address
             else:
                 host, port = parts
@@ -343,7 +357,8 @@ class Recipe:
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
                 self.zodb_ws, options['executable'], options['bin-directory'],
                 initialization=arguments_info,
-                arguments=', '.join(arg_list), extra_paths=extra_paths
+                arguments=', '.join(arg_list), extra_paths=extra_paths,
+                relative_paths=self._relative_paths,
                 )
 
         # The backup script, pointing to repozo.py
@@ -358,6 +373,7 @@ class Recipe:
                 {}, options['executable'], options['bin-directory'],
                 extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
                                directory],
+                relative_paths=self._relative_paths,
                 )
 
         if sys.platform == 'win32':
@@ -372,7 +388,7 @@ class Recipe:
                 software_home = join(zope2_location, 'lib', 'python')
             else:
                 software_home = None
-            
+
             arguments = {'PYTHON': self.options['executable'],
                          'SOFTWARE_HOME': software_home,
                          'zodb3_home': self.zodb3_home,
@@ -380,7 +396,7 @@ class Recipe:
                          'INSTANCE_HOME': location,
                          'PYTHONPATH': os.path.pathsep.join(self.ws_locations),
                          'PACKAGE': 'zeo'}
-            
+
             if zope2_location is not None:
                 # zeoservice.py
                 # requires zope2_location due to the nt_svcutils package
@@ -389,7 +405,7 @@ class Recipe:
                 zeo_file = os.path.join(self.options['bin-directory'],
                                         zeo_filename)
                 self._write_file(zeo_file, zeo_service % arguments)
-                
+
                 initialization = """
                 import os; os.environ['PYTHONPATH'] = %r
                 """.strip() % os.path.pathsep.join(self.ws_locations)
@@ -407,7 +423,7 @@ class Recipe:
             # runzeo.bat
             runzeo_filename = '%s-runzeo.bat' % self.name
             runzeo = open(join(curdir, 'runzeo.bat')).read()
-            self._write_file(os.path.join(self.options['bin-directory'], 
+            self._write_file(os.path.join(self.options['bin-directory'],
                              runzeo_filename), runzeo % arguments)
 
 
@@ -421,7 +437,7 @@ class Recipe:
         logger.debug('Wrote file %s' % path)
         os.chmod(path, 0755)
         logger.warning('Changed mode for %s to 755' % path)
-    
+
 
 invalid_z2_location_msg = """
 'zope2-location' (%r) doesn't point to an actual Zope2 SOFTWARE_HOME. Check this
