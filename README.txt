@@ -42,7 +42,8 @@ zeo-conf
 The following options all affect the generated zope.conf.
 
 zeo-address
-  Give a port for the ZEO server. Defaults to 8100.
+  Give a port for the ZEO server (either specify the port number only (with
+  'localhost' as default) or you use the format ``host:port``). Defaults to 8100.
 
 effective-user
   The name of the effective user for the ZEO process. Defaults to not setting
