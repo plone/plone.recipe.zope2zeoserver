@@ -400,10 +400,10 @@ class Recipe:
             if zope2_location is not None:
                 # zeoservice.py
                 # requires zope2_location due to the nt_svcutils package
-                zeo_filename = '%s-zeoservice.py' % self.name
+                zeo_filename = '%s_service' % self.name
                 zeo_service = open(join(curdir, 'zeoservice.py.in')).read()
                 zeo_file = os.path.join(self.options['bin-directory'],
-                                        zeo_filename)
+                                        '%s.py' % zeo_filename)
                 self._write_file(zeo_file, zeo_service % arguments)
 
                 initialization = """
@@ -421,7 +421,7 @@ class Recipe:
 
 
             # runzeo.bat
-            runzeo_filename = '%s-runzeo.bat' % self.name
+            runzeo_filename = '%s_runzeo.bat' % self.name
             runzeo = open(join(curdir, 'runzeo.bat')).read()
             self._write_file(os.path.join(self.options['bin-directory'],
                              runzeo_filename), runzeo % arguments)
