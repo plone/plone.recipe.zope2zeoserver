@@ -4,10 +4,14 @@ Change History
 1.4 (unreleased)
 ----------------
 
+* Make sure that it's still possible to specify a storage to pack using the -S
+  parameter for bin/zeopack.
+  [davisagli]
+
 * Documented the format of the authentication database file.
   [hannosch]
 
-* Added support for more than one zeoinstance per buildout on win32 enviroments
+* Added support for more than one zeoinstance per buildout on win32 environments
   [erico_andrei]
 
 * Added support for relative-paths in the script generation.

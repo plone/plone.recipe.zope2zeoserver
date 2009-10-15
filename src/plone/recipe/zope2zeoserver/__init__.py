@@ -338,7 +338,6 @@ class Recipe:
                 password=password,
                 realm=realm,
                 blob_dir=options.get('blob-storage', None),
-                storage=1,
             )
             arguments_info = ''
             for k,v in arguments.items():
@@ -346,7 +345,9 @@ class Recipe:
                     arguments_info += '%s = None\n' % k
                 else:
                     arguments_info += '%s = "%s"\n' % (k, v)
-
+            arguments_info += ("import getopt; opts = getopt.getopt("
+                               "sys.argv[1:], 'S:W1')[0]; storage = "
+                               "opts and opts[0][1] or '1'")
             extra_paths = [location for location in self.ws_locations
                            if location not in self.zodb_ws.entries]
             # Make sure the recipe itself and its dependencies are on the path
