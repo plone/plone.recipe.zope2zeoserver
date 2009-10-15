@@ -1,7 +1,7 @@
 Change History
 ==============
 
-1.4 (unreleased)
+1.4 (2009-10-15)
 ----------------
 
 * Make sure that it's still possible to specify a storage to pack using the -S
