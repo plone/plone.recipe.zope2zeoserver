@@ -9,30 +9,22 @@ You can use it with a part like this::
 
   [zeoserver]
   recipe = plone.recipe.zope2zeoserver
-  zope2-location = /path/to/zope2/install
   zeo-address = 8100
 
 Options
 -------
 
-zope2-location
-  The path where Zope 2 is installed. If you are also using the
-  plone.recipe.zope2install recipe, and you have that configured as a part
-  called 'zope2' prior to the zope2zeoserver part, you can use
-  ${zope2:location} for this parameter. You must ensure the zope2zeoserver part
-  is run *after* the zope2install one.
-
 zeopack
   The path to the zeopack.py backup script. A wrapper for this will be
   generated in bin/zeopack, which sets up the appropriate environment to
-  run this. Defaults to "${zope2-location}/utilities/ZODBTools/zeopack.py".
+  run this. Defaults to using the zeopack script from the ZODB3 egg.
   Set this option to an empty value if you do not want this script to be
   generated.
 
 repozo
   The path to the repozo.py backup script. A wrapper for this will be
   generated in bin/repozo, which sets up the appropriate environment for
-  running this. Defaults to "${zope2-location}/utilities/ZODBTools/repozo.py".
+  running this. Defaults to using the repozo script from the ZODB3 egg.
   Set this to an empty value if you do not want this script to be generated.
 
 zeo-conf

@@ -1,9 +1,13 @@
 Change History
 ==============
 
-1.5 (unreleased)
+2.0 (unreleased)
 ----------------
 
+* Modified for compatibility with eggified Zopes (Zope >= 2.12).  Use
+  plone.recipe.zope2zeoserver from the 1.x series for compatibility with older
+  Zopes.
+  [davisagli]
 
 1.4 (2009-10-15)
 ----------------
