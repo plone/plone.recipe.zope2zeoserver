@@ -111,6 +111,11 @@ relative-paths
   Set this to `true` to make the generated scripts use relative
   paths. You can also enable this in the `[buildout]` section.
 
+eggs
+  Set if you need to include other packages as eggs e.g. for making
+  application code available on the ZEO server side for performing
+  conflict resolution (through the _p_resolveConflict() handler).
+
 Reporting bugs or asking questions
 ----------------------------------
 
