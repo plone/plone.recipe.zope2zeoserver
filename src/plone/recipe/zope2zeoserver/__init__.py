@@ -53,6 +53,14 @@ class Recipe:
     def ws_locations(self):
         if self._ws_locations is None:
             self._ws_locations = [d.location for d in self.zodb_ws]
+            # account for zope2-location, if provided
+            zope2_location = self.options.get('zope2-location')
+            if zope2_location is not None:
+                software_home = os.path.join(zope2_location,
+                                             'lib', 'python')
+                assert os.path.isdir(software_home), (invalid_z2_location_msg %
+                                                      zope2_location)
+                self._ws_locations.append(software_home)
         return self._ws_locations
     ws_locations = property(ws_locations)
 
@@ -272,6 +280,7 @@ class Recipe:
         zc.buildout.easy_install.scripts(
             [(self.name, 'plone.recipe.zope2zeoserver.ctl', 'main')],
             ws, options['executable'], options['bin-directory'],
+            extra_paths = self.ws_locations,
             initialization = initialization,
             arguments = ('\n        ["-C", %r]'
                          '\n        + sys.argv[1:]'
@@ -286,8 +295,8 @@ class Recipe:
             if zeopack and os.path.exists(zeopack):
                 zc.buildout.easy_install.scripts(
                     [('zeopack', os.path.splitext(filename)[0], 'main')],
-                    ws, options['executable'], options['bin-directory'],
-                    extra_paths = ws + [directory],
+                    {}, options['executable'], options['bin-directory'],
+                    extra_paths = self.ws_locations + [directory],
                     relative_paths=self._relative_paths,
                     )
         else:
@@ -339,37 +348,39 @@ class Recipe:
             arguments_info += ("import getopt; opts = getopt.getopt("
                                "sys.argv[1:], 'S:W1')[0]; storage = "
                                "opts and opts[0][1] or '1'")
+            extra_paths = [location for location in self.ws_locations
+                           if location not in self.zodb_ws.entries]
+            # Make sure the recipe itself and its dependencies are on the path
+            extra_paths.append(ws.by_key[options['recipe']].location)
+            extra_paths.append(ws.by_key['zc.buildout'].location)
+            extra_paths.append(ws.by_key['zc.recipe.egg'].location)
             zc.buildout.easy_install.scripts(
                 [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
                 self.zodb_ws, options['executable'], options['bin-directory'],
                 initialization=arguments_info,
-                arguments=', '.join(arg_list),
+                arguments=', '.join(arg_list), extra_paths=extra_paths,
                 relative_paths=self._relative_paths,
                 )
 
         # The backup script, pointing to repozo.py
         repozo = options.get('repozo', None)
         if repozo is None:
-            repozo = 'ZODB.scripts.repozo'
-            extra_paths = []
-        else:
-            if not os.path.exists(repozo):
-                raise AssertionError('Custom repozo script not found: %s' % repozo)
-            directory, filename = os.path.split(repozo)
-            repozo = os.path.splitext(filename)[0]
-            extra_paths = [directory]
-        zc.buildout.easy_install.scripts(
-            [('repozo', repozo, 'main')],
-            self.zodb_ws, options['executable'], options['bin-directory'],
-            extra_paths = extra_paths,
-            relative_paths=self._relative_paths,
-            )
+            repozo = os.path.join(options['zope2-location'], 'utilities', 'ZODBTools', 'repozo.py')
+
+        directory, filename = os.path.split(repozo)
+        if repozo and os.path.exists(repozo):
+            zc.buildout.easy_install.scripts(
+                [('repozo', os.path.splitext(filename)[0], 'main')],
+                {}, options['executable'], options['bin-directory'],
+                extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
+                               directory],
+                relative_paths=self._relative_paths,
+                )
 
         if sys.platform == 'win32':
             self.install_win32_scripts()
 
     def install_win32_scripts(self):
-            # XXX FIXME for Zope 2.12
             location = self.options['location']
 
             zope2_location = self.options.get('zope2-location', None)
@@ -428,6 +439,12 @@ class Recipe:
         os.chmod(path, 0755)
         logger.warning('Changed mode for %s to 755' % path)
 
+
+invalid_z2_location_msg = """
+'zope2-location' (%r) doesn't point to an actual Zope2 SOFTWARE_HOME. Check this
+setting and, eventually, make sure this buildout part is being run after the
+part that is supposed to provide the 'zope2-location' value.
+""".strip()
 
 zodb_import_msg = """
 Unable to import ZEO. Please, either add the ZODB3 egg to the 'eggs' entry or
