@@ -4,6 +4,9 @@ Change History
 1.5 (unreleased)
 ----------------
 
+- LP #503686: Added support for setting ZEO log level.
+  [baijum]
+
 - Added note on 'eggs' option.
   [ajung]
 
