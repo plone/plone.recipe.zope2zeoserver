@@ -5,16 +5,21 @@ This recipe creates and configures a Zope 2 ZEO server in parts. It also
 installs a control script, which is like zeoctl, in the bin/ directory.
 The name of the control script is the the name of the part in buildout.
 
-This recipe works with Zope 2 versions prior to Zope 2.12 or ZODB3 versions
-prior to ZODB 3.8. If you want to use newer versions of any of the two please
-use the plone.recipe.zeoserver recipe instead.
-
 You can use it with a part like this::
 
   [zeoserver]
   recipe = plone.recipe.zope2zeoserver
   zope2-location = /path/to/zope2/install
   zeo-address = 8100
+
+.. ATTENTION::
+  This recipe works with Zope 2 versions prior to Zope 2.12 or ZODB3
+  versions prior to ZODB 3.8. If you want to use newer versions of any
+  of the two (for example for Plone 4) please use the
+  `plone.recipe.zeoserver`_: recipe instead.
+
+.. _`plone.recipe.zeoserver`: http://pypi.python.org/pypi/plone.recipe.zeoserver
+
 
 Options
 -------
