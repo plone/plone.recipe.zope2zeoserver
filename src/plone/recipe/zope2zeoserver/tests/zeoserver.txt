@@ -172,6 +172,47 @@ We should have a zeo.conf with a log level set to `error`::
     ...
     <BLANKLINE>
 
+ZEO server read only
+====================
+
+Setting the `read-only` option to `true`, it is possible to set the ZEO server
+in read-only mode. Let's check it::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... parts = zeo
+    ... index = http://pypi.python.org/simple
+    ... develop =
+    ...     %(recipe_location)s
+    ...
+    ... [zeo]
+    ... recipe = plone.recipe.zope2zeoserver
+    ... zope2-location = %(zope_location)s
+    ... read-only = true
+    ...
+    ... ''' % globals())
+
+Let's run it::
+
+    >>> print system(join('bin', 'buildout')),
+    Develop: '...'
+    Uninstalling zeo.
+    Installing zeo...
+
+We should have in the `<zeo>` section the line `read-only true`::
+
+    >>> zeo = os.path.join(sample_buildout, 'parts', 'zeo')
+    >>> print open(os.path.join(zeo, 'etc', 'zeo.conf')).read()
+    ...
+    %define INSTANCE ...
+    <zeo>
+    ...
+      read-only true
+    ...
+    </zeo>
+    ...
+
 Zeopack
 =======
 

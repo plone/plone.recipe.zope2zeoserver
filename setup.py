@@ -2,13 +2,13 @@ import os
 from setuptools import setup, find_packages
 
 name = "plone.recipe.zope2zeoserver"
-version = '2.0'
+version = '1.4.1-alert'
 
 def read(*rnames):
     return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
 
 long_description=(
-        read('README.txt')
+        read('README.rst')
         + '\n' +
         read('CHANGES.txt')
     )
