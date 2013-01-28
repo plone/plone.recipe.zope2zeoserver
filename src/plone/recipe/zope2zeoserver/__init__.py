@@ -291,12 +291,13 @@ class Recipe:
             relative_paths=self._relative_paths,
             )
         # zeopack.py
+        script_name = options.get('zeopack-script-name', 'zeopack')
         zeopack = options.get('zeopack', None)
         if zeopack is not None:
             directory, filename = os.path.split(zeopack)
             if zeopack and os.path.exists(zeopack):
                 zc.buildout.easy_install.scripts(
-                    [('zeopack', os.path.splitext(filename)[0], 'main')],
+                    [(script_name, os.path.splitext(filename)[0], 'main')],
                     {}, options['executable'], options['bin-directory'],
                     extra_paths = self.ws_locations + [directory],
                     relative_paths=self._relative_paths,
@@ -357,7 +358,7 @@ class Recipe:
             extra_paths.append(ws.by_key['zc.buildout'].location)
             extra_paths.append(ws.by_key['zc.recipe.egg'].location)
             zc.buildout.easy_install.scripts(
-                [('zeopack', 'plone.recipe.zope2zeoserver.pack', 'main')],
+                [(script_name, 'plone.recipe.zope2zeoserver.pack', 'main')],
                 self.zodb_ws, options['executable'], options['bin-directory'],
                 initialization=arguments_info,
                 arguments=', '.join(arg_list), extra_paths=extra_paths,
@@ -365,6 +366,7 @@ class Recipe:
                 )
 
         # The backup script, pointing to repozo.py
+        script_name = options.get('repozo-script-name', 'repozo')
         repozo = options.get('repozo', None)
         if repozo is None:
             repozo = os.path.join(options['zope2-location'], 'utilities', 'ZODBTools', 'repozo.py')
@@ -372,7 +374,7 @@ class Recipe:
         directory, filename = os.path.split(repozo)
         if repozo and os.path.exists(repozo):
             zc.buildout.easy_install.scripts(
-                [('repozo', os.path.splitext(filename)[0], 'main')],
+                [(script_name, os.path.splitext(filename)[0], 'main')],
                 {}, options['executable'], options['bin-directory'],
                 extra_paths = [os.path.join(options['zope2-location'], 'lib', 'python'),
                                directory],

@@ -35,6 +35,7 @@ setup(
     namespace_packages = ['plone', 'plone.recipe'],
     install_requires = ['zc.buildout', 'setuptools', 'zc.recipe.egg'],
     tests_require=['zope.testing'],
+    extras_require = {'testing': ['zope.testing']},
     zip_safe=False,
     entry_points = {'zc.buildout': ['default = %s:Recipe' % name]},
     )

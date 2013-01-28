@@ -28,7 +28,8 @@ plone.recipe.zope2instance::
 
 Let's run it::
 
-    >>> print system(join('bin', 'buildout')),
+    >>> print "Beginning" + system(join('bin', 'buildout')),
+    Beginning...
     Develop: '...'
     ...
     Installing zeo.
@@ -291,6 +292,64 @@ Now check the values for `host`, `port` and `unix`::
     True
     >>> 'unix = "/path/to/zeo.socket"' in zeopack
     True
+
+You can change the name of the zeopack script::
+    
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... parts = zeo
+    ... index = http://pypi.python.org/simple
+    ... develop =
+    ...     %(recipe_location)s
+    ...
+    ... [zeo]
+    ... recipe = plone.recipe.zope2zeoserver
+    ... zope2-location = %(zope_location)s
+    ... repozo = xxx
+    ... zeopack-script-name = custom_zeopack
+    ...
+    ... ''' % globals())
+    >>> print system(join('bin', 'buildout')),
+    Develop: '...'
+    Uninstalling zeo.
+    Installing zeo...
+
+Now check the name of the script1::
+
+    >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'custom_zeopack')
+    >>> os.listdir('bin')
+    ['custom_zeopack', 'zeopack', 'zeo', 'buildout', 'repozo']
+
+Custom Repozo scripts
+=====================
+
+You can also customize the name of your repozo backup script::
+
+    >>> write('buildout.cfg',
+    ... '''
+    ... [buildout]
+    ... parts = zeo
+    ... index = http://pypi.python.org/simple
+    ... develop =
+    ...     %(recipe_location)s
+    ...
+    ... [zeo]
+    ... recipe = plone.recipe.zope2zeoserver
+    ... zope2-location = %(zope_location)s
+    ... repozo-script-name = custom_repozo
+    ...
+    ... ''' % globals())
+    >>> print system(join('bin', 'buildout')),
+    Develop: '...'
+    Uninstalling zeo.
+    Installing zeo...
+
+Now check the name of the script1::
+
+    >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'custom_zeopack')
+    >>> os.listdir('bin')
+    ['custom_zeopack', 'custom_repozo', 'zeopack', 'zeo', 'buildout', 'repozo']
 
 Relative paths in scripts
 =========================

@@ -10,6 +10,9 @@ Change History
 - Added note on 'eggs' option.
   [ajung]
 
+- Added option to customize repozo and zeopack names
+  [do3cc]
+
 1.4 (2009-10-15)
 ----------------
 

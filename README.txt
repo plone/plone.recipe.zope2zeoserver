@@ -38,11 +38,19 @@ zeopack
   Set this option to an empty value if you do not want this script to be
   generated.
 
+zeopack-script-name
+  The name of the generated zeopack script in the context of 
+  the bin directory. Defaults to "zeopack".
+
 repozo
   The path to the repozo.py backup script. A wrapper for this will be
   generated in bin/repozo, which sets up the appropriate environment for
   running this. Defaults to "${zope2-location}/utilities/ZODBTools/repozo.py".
   Set this to an empty value if you do not want this script to be generated.
+
+repozo-script-name
+  The name of the generated repozo script in the context of
+  the bin directory. Defaults to "repozo"
 
 zeo-conf
   A relative or absolute path to a zeo.conf file. If this is not given, a
