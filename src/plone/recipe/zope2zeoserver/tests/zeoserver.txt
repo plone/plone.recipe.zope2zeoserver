@@ -28,7 +28,7 @@ plone.recipe.zope2instance::
 
 Let's run it::
 
-    >>> print "Beginning" + system(join('bin', 'buildout')),
+    >>> print "Beginning\n" + system(join('bin', 'buildout')),
     Beginning...
     Develop: '...'
     ...
