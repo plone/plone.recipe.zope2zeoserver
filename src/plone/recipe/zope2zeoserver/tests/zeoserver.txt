@@ -318,8 +318,8 @@ You can change the name of the zeopack script::
 Now check the name of the script1::
 
     >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'custom_zeopack')
-    >>> os.listdir('bin')
-    ['custom_zeopack', 'zeopack', 'zeo', 'buildout', 'repozo']
+    >>> 'custom_zeopack' in os.listdir('bin')
+    True
 
 Custom Repozo scripts
 =====================
@@ -347,9 +347,8 @@ You can also customize the name of your repozo backup script::
 
 Now check the name of the script1::
 
-    >>> zeopack_path = os.path.join(sample_buildout, 'bin', 'custom_zeopack')
-    >>> os.listdir('bin')
-    ['custom_zeopack', 'custom_repozo', 'zeopack', 'zeo', 'buildout', 'repozo']
+    >>> 'custom_repozo' in os.listdir('bin')
+    True
 
 Relative paths in scripts
 =========================
