@@ -1,7 +1,7 @@
 Change History
 ==============
 
-1.5 (unreleased)
+1.5 (2013-01-29)
 ----------------
 
 - LP #503686: Added support for setting ZEO log level.
