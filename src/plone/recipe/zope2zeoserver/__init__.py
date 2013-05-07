@@ -176,6 +176,7 @@ class Recipe:
             invalidation_queue_size = options.get('invalidation-queue-size',
                                                   '100')
 
+            read_only = options.get('read-only', 'false')
             base_dir = self.buildout['buildout']['directory']
             socket_name = options.get('socket-name',
                                       '%s/var/zeo.zdsock' % base_dir)
@@ -232,7 +233,6 @@ class Recipe:
                 file_storage = file_storage,
                 blob_storage = blob_storage
                 )
-
             zeo_conf = zeo_conf_template % dict(
                 instance_home = instance_home,
                 effective_user = effective_user,
@@ -247,6 +247,7 @@ class Recipe:
                 zeo_conf_additional = zeo_conf_additional,
                 monitor_address = monitor_address,
                 zeo_log_level = zeo_log_level,
+                read_only = read_only,
                 )
 
         zeo_conf_path = os.path.join(location, 'etc', 'zeo.conf')
@@ -497,7 +498,7 @@ zeo_conf_template = """\
 
 <zeo>
   address %(zeo_address)s
-  read-only false
+  read-only %(read_only)s
   invalidation-queue-size %(invalidation_queue_size)s
   pid-filename %(pid_file)s
   %(authentication)s
