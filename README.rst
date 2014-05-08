@@ -141,6 +141,10 @@ eggs
   application code available on the ZEO server side for performing
   conflict resolution (through the _p_resolveConflict() handler).
 
+read-only
+  Set it to `true` if you want to put the ZEO server in read-only mode.
+  No modifications will be made on the Data.fs.
+
 Reporting bugs or asking questions
 ----------------------------------
 
